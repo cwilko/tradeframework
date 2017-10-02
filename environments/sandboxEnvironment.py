@@ -4,9 +4,9 @@
 # For representing a Spread Betting trading platform
 # ======================
 
-from .. import TradeEnvironment, Context
-from ..engines import BaselineEngine
-from ..txMgr import SpreadsTxMgr, NullTxMgr
+from api import TradeEnvironment, Context
+from engines import BaselineEngine
+from txMgr import SpreadsTxMgr, NullTxMgr
 
 class SandboxEnvironment(TradeEnvironment):
 	def __init__(self, name):

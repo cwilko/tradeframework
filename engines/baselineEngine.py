@@ -1,7 +1,7 @@
 # ======================          
 # SpreadsEngine Class
 # ======================
-from .. import TradeEngine
+from api import TradeEngine
 import pandas as pd
 
 class BaselineEngine(TradeEngine):

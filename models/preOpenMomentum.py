@@ -1,7 +1,5 @@
 import pandas as pd
-import numpy as np
-import strategies as st
-from .. import Model
+from api import Model
 
 class PreOpenMomentum(Model):
 	def __init__(self, name, env):
