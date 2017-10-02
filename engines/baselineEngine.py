@@ -3,7 +3,6 @@
 # ======================
 from .. import TradeEngine
 import pandas as pd
-import numpy as np
 
 class BaselineEngine(TradeEngine):
 
@@ -20,8 +19,8 @@ class BaselineEngine(TradeEngine):
 		# Returns (Bar and Gap)
 		barRet = s1.multiply((data.Close - data.Open ) / data.Open, axis=0) + 1
 		gapRet = s2.multiply((data.Open.shift(-1) - data.Close) / data.Close, axis=0) + 1
-		print data[:110]
-		print pd.concat([data.Open, data.Close, data.Open.shift(-1), s1.multiply((data.Close - data.Open ) / data.Open, axis=0) + 1, s2.multiply((data.Open.shift(-1) - data.Close) / data.Close, axis=0) + 1], axis=1)[:110]
+		#print data[:110]
+		#print pd.concat([data.Open, data.Close, data.Open.shift(-1), s1.multiply((data.Close - data.Open ) / data.Open, axis=0) + 1, s2.multiply((data.Open.shift(-1) - data.Close) / data.Close, axis=0) + 1], axis=1)[:110]
 
 		
 		# Transaction Costs		
@@ -30,9 +29,11 @@ class BaselineEngine(TradeEngine):
 	
 		# Total Returns
 		#newReturns = barRet.multiply(tx1, axis=0).multiply(gapRet,axis=0).multiply(tx2, axis=0).prod(axis=1).to_frame()
-		newReturns = barRet.multiply(gapRet,axis=0).prod(axis=1).to_frame()
+		#newReturns = barRet.multiply(gapRet,axis=0).prod(axis=1).to_frame()
+		newReturns = barRet.multiply(gapRet,axis=0)
+
 		newReturns.columns = self.returns.columns
-		print newReturns[:110]
+		#print newReturns[:110]
 		self.returns = pd.concat([self.returns, newReturns], join="outer", axis=0)
 
 		#print self.returns

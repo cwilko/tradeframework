@@ -1,5 +1,4 @@
 from . import Strategy
-import numpy as np
 import pandas as pd
 
 # ======================          
@@ -19,6 +18,7 @@ class Portfolio(Strategy):
 
 	def addModel(self, model):
 		self.strategy_list.append(model)
+		return model
 
 	def handleData(self, context, data, index):
 
