@@ -1,4 +1,5 @@
 **/*.pyc
 data
-cert
+**/cred
 **/.ipynb_checkpoints
+**/.~lock*
