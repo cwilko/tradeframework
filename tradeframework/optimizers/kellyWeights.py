@@ -2,6 +2,7 @@ from tradeframework.api import Optimizer
 from tradeframework.api import TradeEngine
 
 import numpy as np
+import pandas as pd
 
 class KellyOptimizer(Optimizer):
 
@@ -11,21 +12,22 @@ class KellyOptimizer(Optimizer):
 		return
 
 	def getWeights(self, context, returns):
-		returns = np.array([TradeEngine.getPeriodReturns(ret).values.flatten() for ret in returns])
+		pReturns = np.array([TradeEngine.getPeriodReturns(ret).values.flatten() for ret in returns])
+
 		if (self.window is None):
-			F = self.getKellyWeights(returns).T
+			F = self.getKellyWeights(pReturns).T
 		else:
-			if ((returns.shape[1] > self.window) | (self.window == 0)):
-				F_zero = np.zeros((len(returns),self.window))
-				F = np.append(F_zero, np.array([self.getKellyWeights(returns[:,:i]) for i in range(self.window+1,returns.shape[1]+1)]).T, axis=1)
+			if ((pReturns.shape[1] > self.window) | (self.window == 0)):
+				F_zero = np.zeros((len(pReturns),self.window))
+				F = np.append(F_zero, np.array([self.getKellyWeights(pReturns[:,:i]) for i in range(self.window+1,pReturns.shape[1]+1)]).T, axis=1)
 
 				# Avoid lookahead by shifting the weights by a period.
 				F[:,-1] = 0
 				np.roll(F,1)
 			else:
-				F = np.zeros(returns.shape)
+				F = np.zeros(pReturns.shape)
 
-		return F
+		return [pd.DataFrame(np.array([[assetWeight, assetWeight]]).T, index=returns[0].index, columns=returns[0].columns) for assetWeight in F]
 
 	@staticmethod	
 	def getKellyWeights(returns):
