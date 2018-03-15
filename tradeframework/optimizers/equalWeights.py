@@ -1,4 +1,6 @@
 from tradeframework.api import Optimizer
+import numpy as np
+import pandas as pd
 
 class EqualWeightsOptimizer(Optimizer):
 
@@ -9,6 +11,8 @@ class EqualWeightsOptimizer(Optimizer):
 	def getWeights(self, context, returns):
 		# Equal Weighting
 		n = len(returns)
-		F = [(1.0/n)] * n
-		return F
-		print F
+		F = np.ones(returns[0].shape) / n
+		
+		return [pd.DataFrame(F, index=returns[0].index, columns=returns[0].columns) for _ in returns]
+
+		

@@ -5,7 +5,8 @@ class PreOpenMomentum(Model):
 	def __init__(self, name, env):
 		Model.__init__(self, name, env)
 		return
-		
+
+	# TODO : Handle list of assetInfos
 	def handleData(self, context, assetInfo):
 		Model.handleData(self, context, assetInfo)
 		
@@ -26,7 +27,7 @@ class PreOpenMomentum(Model):
 		
 		del context[self.name]['temp']
 		
-		return self.getDerivativeInfo(context, assetInfo, signals)
+		return self.getDerivativeInfo(context, [assetInfo], [signals])
 
 # Whichever direction the market has moved by morning EST, trade in the same direction until the close.
 def gap_close_predict(ohlc, context):

@@ -6,7 +6,8 @@ class BuyAndHold(Model):
 	def __init__(self, name, env):
 		Model.__init__(self, name, env)
 		return
-		
+	
+	# TODO : Handle list of assetInfos
 	def handleData(self, context, assetInfo):
 		Model.handleData(self, context, assetInfo)
 		
@@ -17,4 +18,4 @@ class BuyAndHold(Model):
 		#self.signals = pd.concat([self.signals, newSignals], join="outer", axis=0)
 		signals = pd.DataFrame(np.ones((len(assetInfo.values), 2)), index=assetInfo.values.index, columns=["bar","gap"])
 
-		return self.getDerivativeInfo(context, assetInfo, signals)
+		return self.getDerivativeInfo(context, [assetInfo], [signals])

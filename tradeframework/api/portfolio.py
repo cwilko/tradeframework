@@ -32,18 +32,14 @@ class Portfolio(Derivative):
 			context[self.name] = {}
 		
 		# Update all children
-		derivInfo_list = [derivative.handleData(context[self.name], assetInfo) for derivative in self.derivative_list]
+		derivInfos = [derivative.handleData(context[self.name], assetInfo) for derivative in self.derivative_list]
 
 		# Calculate portfolio allocation
-		weights = self.optimizer.getWeights(context[self.name], [dInfo.returns for dInfo in derivInfo_list])  
-		# TODO : Apply weights to bar and gap
-		context[self.name]["weights"] = weights
-		# Calculate portfolio values
-		#dInfo = self.env.tradeEngine.getDerivativeInfo([dInfo.values for dInfo in derivInfo_list], weights)
+		weights = self.optimizer.getWeights(context[self.name], [dInfo.returns for dInfo in derivInfos])  
 
-		#  Get allocations for each derivative
-		dAllocations = [(a.allocations.T*b).T for a,b in zip(derivInfo_list,weights)] # TODO : this is wrong, merge into getDerivativeInfo
-		
+		# Calculate portfolio values
+		# dInfo = 
+
 		# Get allocations for each underlying asset
 		# TODO : Possibly do this outside of this function.
 		# uAllocations = 
@@ -53,4 +49,4 @@ class Portfolio(Derivative):
 		#Allocations = reduce(lambda x, y: x.add(y, fill_value=0), dAllocations) 
 
 		# Return portfolio allocations
-		return self.env.tradeEngine.getDerivativeInfo(self.name, assetInfo.values, derivInfo_list[0].weights) # TODO : return dInfo
+		return self.getDerivativeInfo(context, derivInfos, weights)

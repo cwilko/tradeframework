@@ -30,7 +30,7 @@ class TradeEnvironment():
 		optimizer = optInstance(optName, self, **opts)
 		return optimizer
 
-	def handleData(self, context, data):
+	def handleData(self, context, assetInfo):
 		pass
 		
 

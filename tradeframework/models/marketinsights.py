@@ -16,6 +16,7 @@ class MarketInsightsModel(Model):
 		return
 	
 	# Generate Signals and use them with asset values to calculate allocations	
+	# TODO : Handle list of assetInfos
 	def handleData(self, context, assetInfo):
 		Model.handleData(self, context, assetInfo)
 
@@ -27,7 +28,7 @@ class MarketInsightsModel(Model):
 
 		signals.update(predictions)
 			
-		return self.getDerivativeInfo(context, assetInfo, signals)
+		return self.getDerivativeInfo(context, [assetInfo], [signals])
 
 	def getPredictions(self, start, end):
 
