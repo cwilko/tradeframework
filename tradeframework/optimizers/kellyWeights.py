@@ -15,7 +15,9 @@ class KellyOptimizer(Optimizer):
 		pReturns = np.array([TradeEngine.getPeriodReturns(ret).values.flatten() for ret in returns])
 
 		if (self.window is None):
-			F = self.getKellyWeights(pReturns).T
+			F = self.getKellyWeights(pReturns)
+			F = F.reshape(len(F),1).repeat(len(pReturns[0]),axis=1)
+			
 		else:
 			if ((pReturns.shape[1] > self.window) | (self.window == 0)):
 				F_zero = np.zeros((len(pReturns),self.window))
@@ -23,11 +25,10 @@ class KellyOptimizer(Optimizer):
 
 				# Avoid lookahead by shifting the weights by a period.
 				F[:,-1] = 0
-				np.roll(F,1)
 			else:
 				F = np.zeros(pReturns.shape)
 
-		return [pd.DataFrame(np.array([[assetWeight, assetWeight]]).T, index=returns[0].index, columns=returns[0].columns) for assetWeight in F]
+		return [pd.DataFrame(np.array([assetWeight, assetWeight]).T, index=returns[0].index, columns=returns[0].columns) for assetWeight in F]
 
 	@staticmethod	
 	def getKellyWeights(returns):
@@ -46,6 +47,6 @@ class KellyOptimizer(Optimizer):
 				# Kelly Optimal weighting matrix			
 				M = np.array([returns.mean(axis=1)]).T
 				C = np.cov(returns, ddof=1)
-				F[mask] = np.linalg.inv(C).dot(M)
+				F[mask] = np.linalg.inv(C).dot(M).flatten()
 
 		return F.flatten()
