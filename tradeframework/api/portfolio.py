@@ -1,5 +1,4 @@
 from . import Derivative
-from functools import reduce
 
 # ======================          
 # Portfolio Class
