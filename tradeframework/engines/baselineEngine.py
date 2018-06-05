@@ -43,7 +43,6 @@ class BaselineEngine(TradeEngine):
 	
 		# Iterate over table. Construct deriviative value and relevant allocation.
 		# (ref: Short Sell and Hold phenomenon)
-
 		assetValues = np.array([assetInfo.values[['Open','Close']].values.flatten() for assetInfo in assetInfos]).T
 		weights = np.array([weights.values.flatten() for weights in assetWeights]).T
 		noOfValues = len(assetValues)
@@ -58,8 +57,8 @@ class BaselineEngine(TradeEngine):
 
 		# m x n x 2 matrices
 		columns = pd.MultiIndex.from_product([[assetInfo.name for assetInfo in assetInfos], ["bar","gap"]])
-		dAllocations = pd.DataFrame(np.array(allocations).T.reshape(2*len(assetWeights),len(assetWeights[0])).T, index = assetWeights[0].index, columns=columns)
-		dWeights = pd.DataFrame(np.array(weights).T.reshape(2*len(assetWeights),len(assetWeights[0])).T, index = assetWeights[0].index, columns=columns)
+		dAllocations = pd.DataFrame(np.hstack([x.reshape(len(assetWeights[0]),2) for x in np.array(allocations).T]), index = assetWeights[0].index, columns=columns)
+		dWeights = pd.DataFrame(np.hstack([x.reshape(len(assetWeights[0]),2) for x in np.array(weights).T]), index = assetWeights[0].index, columns=columns)
 		
 		# n x 2 matrices
 		dValues = pd.DataFrame(np.array(dValues).reshape(assetWeights[0].shape), index = assetWeights[0].index, columns=['Open', 'Close'])

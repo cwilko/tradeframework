@@ -29,6 +29,7 @@ class KellyOptimizer(Optimizer):
 				F = np.zeros(pReturns.shape)
 
 		return [pd.DataFrame(np.array([assetWeight, assetWeight]).T, index=returns[0].index, columns=returns[0].columns) for assetWeight in F]
+		
 
 	@staticmethod	
 	def getKellyWeights(returns):
@@ -45,8 +46,8 @@ class KellyOptimizer(Optimizer):
 				F[mask] = np.mean(returns) / np.var(returns, ddof=1)
 			else:
 				# Kelly Optimal weighting matrix			
-				M = np.array([returns.mean(axis=1)]).T
-				C = np.cov(returns, ddof=1)
+				M = np.mean(returns, axis=1)
+				C = np.cov(returns, ddof=1) 
 				F[mask] = np.linalg.inv(C).dot(M).flatten()
-
+				
 		return F.flatten()
