@@ -1,5 +1,6 @@
 **/*.pyc
 data
-examples/cred
+test/cred
 **/.ipynb_checkpoints
-examples/.~lock*
+test/.~lock*
+**/cred
