@@ -32,6 +32,9 @@ class TradeEnvironment():
 
 	def handleData(self, context, assetInfo):
 		pass
+
+	def getTradingInfo(self, context, dInfo, startCapital):
+		pass
 		
 
 class Context:

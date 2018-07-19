@@ -70,7 +70,7 @@ class FrameworkTest(unittest.TestCase):
 
 		class BuyAndHoldModel(Model):
 			def handleData(self, context, assetInfo):
-				signals = pd.DataFrame(np.ones((len(assetInfo.values), 2)), index=assetInfo.values.index, columns=["bar","gap"])
+				signals = pd.DataFrame(np.array([np.zeros(len(assetInfo.values)),np.ones(len(assetInfo.values))]).T, index=assetInfo.values.index, columns=["bar","gap"])
 				return self.getDerivativeInfo(context, [assetInfo], [signals])
 
 		# randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
@@ -88,7 +88,11 @@ class FrameworkTest(unittest.TestCase):
 		p.addModel(RandomModel("TestModel2", env))
 		dInfo = env.handleData({}, self.asset1)
 
+		# Test returns were calculated correctly
 		self.assertTrue(np.allclose(dInfo.returns.values[:,1][:-1], np.array([-.2, .1, -.1, .0, -.1, .0, -.2, .0])))
+
+		# Test underlying allocations were calculated correctly
+		self.assertTrue(np.allclose(dInfo.getUnderlyingAllocations()["DOW"]["gap"].values, np.array([.01, .01, .005, 0, .0051136364, 0, .0104597107, 0, 0])))
 
 	def test_kellyWeights_singleModel(self):
 

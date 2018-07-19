@@ -21,6 +21,7 @@ class PreOpenMomentum(Model):
 
 		# Extract the relevant asset information
 		context[self.name]['temp']['data'] = pd.concat([context[self.name]['temp']['data'], assetValues[(assetValues.index.hour == 16) & (assetValues.index.minute == 00)].resample('B').agg({'Open': 'first'}).fillna(method='ffill').shift(1).dropna()])
+
 		# Generate the signals for the next n steps
 		signals = assetValues.groupby(assetValues.index).apply(lambda x: gap_close_predict(x, context[self.name]['temp']))
 		#self.signals = pd.concat([self.signals, newSignals], join="outer", axis=0)
@@ -36,7 +37,10 @@ def gap_close_predict(ohlc, context):
 	if ohlc.index.date in context['data'].index.date:
 
 		if (ohlc.index.hour == 7) & (ohlc.index.minute == 0):
-			if (ohlc.Open[0] > context['data'].loc[ohlc.index.date].Open[0]):
+			#print(ohlc.Open[0])
+			#print(context["data"].loc[ohlc.index.date[0]].Open)
+
+			if (ohlc.Open[0] > context['data'].loc[ohlc.index.date[0]].Open):
 				context['currentSignal'] = Model.BUY
 			else:
 				context['currentSignal'] = Model.SELL

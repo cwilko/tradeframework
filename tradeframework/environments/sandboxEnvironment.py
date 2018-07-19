@@ -24,6 +24,9 @@ class SandboxEnvironment(TradeEnvironment):
 	def placeOrders(self, context, allocations, assetInfo):
 		return self.tradeEngine.getReturns(assetInfo, allocations)
 
+	def getTradingInfo(self, context, dInfo, startCapital):
+		return self.tradeEngine.getTradingInfo(dInfo, startCapital)
+
 class SandboxContext(Context):
 	def __init__(self, context):
 		self.context = context
