@@ -11,9 +11,9 @@ from IPython.display import display
 
 # Helper method to merge bar and gap returns into a single period
 def getPeriodReturns(returns):
-	returns = (returns + 1).prod(axis=1)-1
-	returns.columns = ["period"]
-	return returns
+    returns = (returns + 1).prod(axis=1)-1
+    returns.columns = ["period"]
+    return returns
 
 # Helper method to pretty print derviative performance
 def plot(dInfo, baseline=None, log=False, includeComponents=False, includePrimary=True):
@@ -57,15 +57,15 @@ def plot(dInfo, baseline=None, log=False, includeComponents=False, includePrimar
     plt.legend(loc='best')
     plt.show() 
 
-def displaySummary(dInfo, tInfo, baseline=None):
+def displaySummary(dInfo, tInfo, baseline=None, log=False, includeComponents=True, includePrimary=True):
     print("Derivative name : " + dInfo.name)
     print("Number of assets : " + str(len(dInfo.assets)))
     if (baseline is not None):
         print("Baseline name : " + baseline.name)
     
     # Summary plot
-    plot(dInfo, baseline, log=False, includeComponents=True, includePrimary=True)
-    	    
+    plot(dInfo, baseline, log, includeComponents, includePrimary)
+            
     # Show sample of trades
     pd.set_option('display.max_rows', 10)    
     display(tInfo)

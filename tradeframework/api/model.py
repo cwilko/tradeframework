@@ -6,12 +6,12 @@ from . import Derivative
 
 class Model(Derivative):
 
-	BUY = 1
-	CASH = 0
-	SELL = -1
+    BUY = 1
+    CASH = 0
+    SELL = -1
 
-	def __init__(self, name, env):
-		Derivative.__init__(self, name, env)
-		
-	def handleData(self, context, assetInfo):		
-		return Derivative.handleData(self, context, assetInfo)
+    def __init__(self, name, env):
+        Derivative.__init__(self, name, env)
+        
+    def handleData(self, context, assetInfo):        
+        return Derivative.handleData(self, context, assetInfo)

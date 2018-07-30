@@ -1,2 +1,2 @@
-from equalWeights import EqualWeightsOptimizer
-from kellyWeights import KellyOptimizer
+from .equalWeights import EqualWeightsOptimizer
+from .kellyWeights import KellyOptimizer

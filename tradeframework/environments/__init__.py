@@ -1,2 +1,2 @@
-from sandboxEnvironment import SandboxEnvironment, SandboxContext
-from ziplineEnvironment import ZiplineEnvironment
+from .sandboxEnvironment import SandboxEnvironment, SandboxContext
+from .ziplineEnvironment import ZiplineEnvironment

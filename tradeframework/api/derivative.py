@@ -9,18 +9,18 @@ class Derivative:
         self.env = env
 
     def getName(self):
-    	return self.name
+        return self.name
 
     def handleData(self, context, assetInfo):
-    	pass
+        pass
 
     def getDerivativeInfo(self, context, assetInfos, weights):
-		## Get allocations from TradeEngine
-		derivInfo = self.env.tradeEngine.getDerivativeInfo(self.name, assetInfos, weights)
-		
-		# Update context 
-		if self.name not in context:
-			context[self.name] = {}
-		context[self.name]['dInfo'] = derivInfo
+        ## Get allocations from TradeEngine
+        derivInfo = self.env.tradeEngine.getDerivativeInfo(self.name, assetInfos, weights)
+        
+        # Update context 
+        if self.name not in context:
+            context[self.name] = {}
+        context[self.name]['dInfo'] = derivInfo
 
-		return derivInfo
+        return derivInfo
