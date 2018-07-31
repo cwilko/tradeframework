@@ -17,12 +17,14 @@ class KellyOptimizer(Optimizer):
 
         if (self.window is None):
             F = self.getKellyWeights(pReturns)
-            F = F.reshape(len(F),1).repeat(len(pReturns[0]),axis=1)
-            
+            F = F.reshape(len(F),1).repeat(len(pReturns[0]),axis=1)            
         else:
             if ((pReturns.shape[1] > self.window) | (self.window == 0)):
                 F_zero = np.zeros((len(pReturns),self.window))
-                F = np.append(F_zero, np.array([self.getKellyWeights(pReturns[:,(i-(self.window+1)):i]) for i in range(self.window+1,pReturns.shape[1]+1)]).T, axis=1)
+                if (self.window == 0):
+                    F = np.append(F_zero, np.array([self.getKellyWeights(pReturns[:,:i]) for i in range(self.window+1,pReturns.shape[1]+1)]).T, axis=1)    
+                else:
+                    F = np.append(F_zero, np.array([self.getKellyWeights(pReturns[:,(i-(self.window+1)):i]) for i in range(self.window+1,pReturns.shape[1]+1)]).T, axis=1)
 
                 # Avoid lookahead by shifting the weights by a period.
                 F[:,-1] = 0

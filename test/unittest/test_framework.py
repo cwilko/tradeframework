@@ -1,13 +1,16 @@
 import unittest
+import os
 import pandas as pd
 import numpy as np
 from tradeframework.api import AssetInfo, Model
 from tradeframework.environments import SandboxEnvironment
 
+dir = os.path.dirname(os.path.abspath(__file__))
+
 class FrameworkTest(unittest.TestCase):
 
     def setUp(self):
-        self.asset1 = AssetInfo("DOW", pd.read_csv('data/testData1.csv', parse_dates=True, index_col=0, dayfirst=True))
+        self.asset1 = AssetInfo("DOW", pd.read_csv(dir+'/data/testData1.csv', parse_dates=True, index_col=0, dayfirst=True))
 
     def test_buyAndHold_singleModel(self):
 
@@ -115,10 +118,9 @@ class FrameworkTest(unittest.TestCase):
             context["TradeFair_Portfolio"]["MyPortfolio"]["TestModel"]["dInfo"].allocations["DOW"]["gap"].values.flatten(),
             [-0.01, 0.015, -0.015, 0.0225, -0.0225, 0.03375, -0.03375, 0.050625, -0.050625]))
 
-        print(context["TradeFair_Portfolio"]["MyPortfolio"]["dInfo"].values["Close"].values.flatten())
         self.assertTrue(np.allclose(
             context["TradeFair_Portfolio"]["MyPortfolio"]["dInfo"].values["Close"].values.flatten(),
-            [1.0000000000e+00, 1.0000000000e+00,4.0000000000e+00,4.4000000000e+01,2.4200000000e+02,2.8233333333e+03,1.6940000000e+04,2.0328000000e+05,1.2705000000e+06]))
+            [1.0000e+00, 1.0000e+00, 1.0000e+00, 7.0000e+00, 4.2000e+01, 4.2000e+02, 2.6600e+03, 2.9260e+04, 1.9019e+05]))
 
     def test_kellyWeights_multiModel(self):
 
@@ -142,10 +144,11 @@ class FrameworkTest(unittest.TestCase):
         p.addModel(RandomModel("TestModel2", env))
         context = {}
         env.handleData(context, self.asset1)
-
+        
         self.assertTrue(np.allclose(
             context["TradeFair_Portfolio"]["MyPortfolio"]["dInfo"].returns["Close"].values.flatten(),
-            [0.0000000000e+00,0.0000000000e+00,0.0000000000e+00,2.0496382304e+16,4.0992764608e+16,2.0496382304e+16,1.3664254869e+16,4.0992764608e+16,0.0000000000e+00]))
+            [ 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 4.52126080e+16, -2.32913435e+16, -1.39748061e+17, -1.18248359e+17, 0.00000000e+00]))
+
 
 if __name__ == '__main__':
     unittest.main()
