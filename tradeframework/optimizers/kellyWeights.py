@@ -8,7 +8,7 @@ class KellyOptimizer(Optimizer):
 
     def __init__(self, name, env, window=0, weight=1.0):
         Optimizer.__init__(self, name, env)
-        self.window = window # TODO: n = window size, 0 = use all previous data, None = include future data (lookahead)
+        self.window = window 
         self.weight = weight
         return
 
@@ -28,7 +28,7 @@ class KellyOptimizer(Optimizer):
 
                 # Avoid lookahead by shifting the weights by a period.
                 F[:,-1] = 0
-                F = np.roll(F, 1)
+                F = np.roll(F, 1) # TODO : Use the roll to apply lookahead if needed.
             else:
                 F = np.zeros(pReturns.shape)
 

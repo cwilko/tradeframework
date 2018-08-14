@@ -2,15 +2,19 @@ import pandas as pd
 import numpy as np
 from tradeframework.api import Model
 
+import quantutils.model.utils as mlutils
+import quantutils.dataset.pipeline as ppl
 from quantutils.api.marketinsights import MarketInsights
+from quantutils.api.functions import Functions
+from quantutils.api.assembly import MIAssembly
 
-class MarketInsightsModel(Model):
-    def __init__(self, name, env, creds, mkt, modelId, threshold):
+class MIBasicModel(Model):
+    def __init__(self, name, env, credstore, dataset_id, training_run_id, threshold):
         Model.__init__(self, name, env)
-
-        self.mi = MarketInsights(creds)
-        self.modelId = modelId
-        self.mkt = mkt
+        
+        self.miassembly = MIAssembly(MarketInsights(credstore), Functions(credstore))
+        self.dataset_id = dataset_id
+        self.training_run_id = training_run_id
         self.threshold = threshold
 
         return
@@ -31,14 +35,11 @@ class MarketInsightsModel(Model):
         return self.getDerivativeInfo(context, [assetInfo], [signals])
 
     def getPredictions(self, start, end):
+        predictions = self.miassembly.get_predictions_with_dataset_id(self.dataset_id, self.training_run_id, start=start, end=end) 
+        predictions = mlutils.aggregatePredictions([predictions], method="mean_all")
+        signals = mlutils.getPredictionSignals(ppl.onehot(predictions.values), self.threshold)
 
-        predictions = self.mi.get_predictions(self.mkt, self.modelId, start=start, end=end) 
-        signals = np.ones(len(predictions))
-        a = np.argmax(predictions.values,axis=1)
-        signals[(a==1)] = -1 # Set any DOWN signals to -1 (UP signals will pick up the default of 1)
-        signals[(predictions.values < self.threshold).all(axis=1)] = 0
-
-        return pd.DataFrame(np.array([signals, signals]).T, index=predictions.index, columns=["bar","gap"])
+        return pd.DataFrame(np.array([signals, np.zeros(len(signals))]).T, index=predictions.index, columns=["bar","gap"])
 
 
 

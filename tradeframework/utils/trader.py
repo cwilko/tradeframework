@@ -2,8 +2,10 @@ import numpy as np
 import pandas as pd 
 
 import quantutils.core.statistics as stats
+import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.dates import DateFormatter, WeekdayLocator, DayLocator, MONDAY
+#from matplotlib.dates import DateFormatter, WeekdayLocator, MonthLocator, DayLocator, MONDAY, AutoDateLocator, AutoDateFormatter
+from matplotlib.dates import AutoDateLocator, AutoDateFormatter
 
 import warnings
 import pyfolio
@@ -16,7 +18,7 @@ def getPeriodReturns(returns):
     return returns
 
 # Helper method to pretty print derviative performance
-def plot(dInfo, baseline=None, log=False, includeComponents=False, includePrimary=True):
+def plot(dInfo, baseline=None, log=False, includeComponents=False, includePrimary=True, custom=[]):
     
     assets = []
     
@@ -31,22 +33,31 @@ def plot(dInfo, baseline=None, log=False, includeComponents=False, includePrimar
     # Add baseline
     if (baseline is not None):
         assets.append(baseline)
+
+    for userdata in custom:
+        assets.append(userdata) 
         
     if (log):
         pnl = lambda x : np.cumsum(np.log((getPeriodReturns(x.returns) + 1).resample('B').agg('prod')))
     else:
         pnl = lambda x : np.cumprod((getPeriodReturns(x.returns) + 1).resample('B').agg('prod'))
 
-    mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
-    alldays = DayLocator()              # minor ticks on the days
-    weekFormatter = DateFormatter('%b %d')  # e.g., Jan 12
+    #quarters = MonthLocator([1, 3, 6, 9])
+    #allmonths = MonthLocator()
+    #mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
+    #alldays = DayLocator()              # minor ticks on the days
+    #weekFormatter = DateFormatter('%b %d')  # e.g., Jan 12
+    auto_locator = AutoDateLocator()
+    auto_formatter = AutoDateFormatter(auto_locator)
     
+    matplotlib.rcParams['figure.figsize'] = (12.0, 6.0)
+    plt.ion()
     fig, ax = plt.subplots()
     fig.subplots_adjust(bottom=0.2)
-    ax.xaxis.set_major_locator(mondays)
-    ax.xaxis.set_minor_locator(alldays)
-    ax.xaxis.set_major_formatter(weekFormatter)
-    
+    ax.xaxis.set_major_locator(auto_locator)
+    #ax.xaxis.set_minor_locator(allmonths)
+    ax.xaxis.set_major_formatter(auto_formatter)
+
     for asset in assets:
         ax.plot(pnl(asset), label=asset.name)
             
@@ -55,9 +66,10 @@ def plot(dInfo, baseline=None, log=False, includeComponents=False, includePrimar
     plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
     plt.title("Derivative performance")
     plt.legend(loc='best')
-    plt.show() 
+    fig.canvas.draw() 
+    return fig, ax
 
-def displaySummary(dInfo, tInfo, baseline=None, log=False, includeComponents=True, includePrimary=True):
+def displaySummary(dInfo, tInfo, baseline=None, log=False, includeComponents=True, includePrimary=True, full=True):
     print("Derivative name : " + dInfo.name)
     print("Number of assets : " + str(len(dInfo.assets)))
     if (baseline is not None):
@@ -70,9 +82,11 @@ def displaySummary(dInfo, tInfo, baseline=None, log=False, includeComponents=Tru
     pd.set_option('display.max_rows', 10)    
     display(tInfo)
     
-    # Show local statistics
-    stats.merton(dInfo.returns["Open"][dInfo.returns["Open"]!=0], baseline.returns["Open"][baseline.returns["Open"]!=0], display=True) 
+    if (baseline is not None):
+        # Show local statistics
+        stats.merton(dInfo.returns["Open"][dInfo.returns["Open"]!=0], baseline.returns["Open"][baseline.returns["Open"]!=0], display=True) 
     
-    # Show generic statistics
-    warnings.filterwarnings('ignore')
-    pyfolio.create_returns_tear_sheet(getPeriodReturns(dInfo.returns))    
+    if(full):
+        # Show generic statistics
+        warnings.filterwarnings('ignore')
+        pyfolio.create_returns_tear_sheet(getPeriodReturns(dInfo.returns))    
