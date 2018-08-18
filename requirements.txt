@@ -1,0 +1,3 @@
+git+git://github.com/cwilko/quantutils.git#egg=quantutils
+numpy==1.14.3
+pandas==0.23.0
