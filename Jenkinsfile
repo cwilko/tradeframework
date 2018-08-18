@@ -1,9 +1,14 @@
 pipeline {
-    agent { docker { image 'python:3.6.5' } }
+    agent none 
     stages {
-        stage('build') {
+        stage('Build') { 
+            agent {
+                docker {
+                    image 'python:2-alpine' 
+                }
+            }
             steps {
-                sh 'py.test'
+                sh 'python -m compileall tradeframework' 
             }
         }
     }
