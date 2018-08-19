@@ -14,10 +14,11 @@ pipeline {
         stage('Test') {
             agent {
                 docker {
-                    image 'dd82ed855d0f'
+                    image 'python:3'
                 }
             }
             steps {
+                sh 'pip install feedparser nosexcover prometheus_client pycobertura pylint pytest pytest-cov setuptools'
                 sh 'pip install -r requirements.txt'
                 sh 'py.test --verbose --junit-xml test-reports/results.xml'
             }
