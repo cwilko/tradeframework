@@ -139,7 +139,7 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellylWeights",  opts={"window":3}))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellylWeights",  opts={"window":4}))
         p.addModel(BuyAndHoldModel("TestModel", env))
         p.addModel(RandomModel("TestModel2", env))
         context = {}
@@ -147,7 +147,7 @@ class FrameworkTest(unittest.TestCase):
         
         self.assertTrue(np.allclose(
             context["TradeFair_Portfolio"]["MyPortfolio"]["dInfo"].returns["Close"].values.flatten(),
-            [ 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 4.52126080e+16, -2.32913435e+16, -1.39748061e+17, -1.18248359e+17, 0.00000000e+00]))
+            [ 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 4.0992764608e+16,2.0496382304e+16,4.0992764608e+16,0.0000000000e+00]))
 
 
 if __name__ == '__main__':
