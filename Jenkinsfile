@@ -18,7 +18,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'pip install -r requirements.txt'
+                sh 'pip --verbose install --verbose --upgrade -r requirements.txt'
                 sh 'py.test --verbose --junit-xml test-reports/results.xml'
             }
             post {
