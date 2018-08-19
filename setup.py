@@ -1,9 +1,8 @@
 
 from setuptools import setup, find_packages
 
-import os
-
-os.system('pip install git+https://github.com/cwilko/quantutils.git')
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
 
 setup(
     # This is the name of your project. The first time you publish this
@@ -31,6 +30,8 @@ setup(
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
     description='A back testing framework',  # Required
+
+    install_requires=requirements,
 
     # You can just specify package directories manually here if your project is
     # simple. Or you can use find_packages().
