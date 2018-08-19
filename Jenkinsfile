@@ -4,7 +4,7 @@ pipeline {
         stage('Build') { 
             agent {
                 docker {
-                    image 'python:3' 
+                    image 'python:3.6-alpine' 
                 }
             }
             steps {
@@ -14,11 +14,11 @@ pipeline {
         stage('Test') {
             agent {
                 docker {
-                    image 'python:3.6'
+                    image 'python:3.6-alpine'
                 }
             }
             steps {
-                sh 'pip install feedparser nosexcover prometheus_client pycobertura pylint pytest pytest-cov setuptools'
+                sh 'pip install pylint pytest pytest-cov'
                 sh 'pip install -r requirements.txt'
                 sh 'py.test --verbose --junit-xml test-reports/results.xml'
             }
