@@ -1,8 +1,10 @@
-# ===========================     
+# ===========================
 # Spreads Transaction Manager
 # ===========================
 
+
 class SpreadsTxMgr():
+
     def _init_():
         pass
 

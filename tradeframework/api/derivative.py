@@ -2,6 +2,7 @@
 # Strategy Class
 # ======================
 
+
 class Derivative:
 
     def __init__(self, name, env):

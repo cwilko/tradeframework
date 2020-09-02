@@ -44,5 +44,5 @@ setup(
     #
     packages=find_packages(exclude=['contrib', 'docs', 'test']),  # Required
 
-   
+
 )
