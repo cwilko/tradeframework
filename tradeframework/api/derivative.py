@@ -1,10 +1,10 @@
-# ======================          
+# ======================
 # Strategy Class
 # ======================
 
 class Derivative:
 
-    def __init__(self, name, env):       
+    def __init__(self, name, env):
         self.name = name
         self.env = env
 
@@ -15,10 +15,11 @@ class Derivative:
         pass
 
     def getDerivativeInfo(self, context, assetInfos, weights):
-        ## Get allocations from TradeEngine
-        derivInfo = self.env.tradeEngine.getDerivativeInfo(self.name, assetInfos, weights)
-        
-        # Update context 
+        # Get allocations from TradeEngine
+        derivInfo = self.env.tradeEngine.getDerivativeInfo(
+            self.name, assetInfos, weights)
+
+        # Update context
         if self.name not in context:
             context[self.name] = {}
         context[self.name]['dInfo'] = derivInfo

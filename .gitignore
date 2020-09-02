@@ -1,6 +1,8 @@
 **/*.pyc
 **/.ipynb_checkpoints
 test/.~lock*
-.pytest_cache/
+**/.pytest_cache/
 **/__py_cache__
 test/data
+**/.cache
+**/test-reports
