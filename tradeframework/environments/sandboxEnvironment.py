@@ -1,4 +1,4 @@
-# ======================          
+# ======================
 # SpreadsEnvironment Class
 #
 # For representing a Spread Betting trading platform
@@ -8,7 +8,9 @@ from tradeframework.api import TradeEnvironment, Context
 from tradeframework.engines import BaselineEngine
 from tradeframework.tx import SpreadsTxMgr, NullTxMgr
 
+
 class SandboxEnvironment(TradeEnvironment):
+
     def __init__(self, name):
         TradeEnvironment.__init__(self, name)
         self.tradeEngine = BaselineEngine("Sandbox Engine", SpreadsTxMgr())
@@ -27,7 +29,9 @@ class SandboxEnvironment(TradeEnvironment):
     def getTradingInfo(self, context, dInfo, startCapital=1):
         return self.tradeEngine.getTradingInfo(dInfo, startCapital)
 
+
 class SandboxContext(Context):
+
     def __init__(self, context):
         self.context = context
         return

@@ -1,4 +1,4 @@
-# ======================          
+# ======================
 # TradeEnvironment Class
 # ======================
 
@@ -35,8 +35,9 @@ class TradeEnvironment():
 
     def getTradingInfo(self, context, dInfo, startCapital=1):
         pass
-        
+
 
 class Context:
+
     def __init__(self):
         pass
