@@ -14,18 +14,18 @@ class MeanReversion(Model):
         self.env
         return
 
-    def handleData(self, context, assetInfo):
-        Model.handleData(self, context, assetInfo)
+    def handleData(self, asset):
+        Model.handleData(self, asset)
 
-        signals = pd.DataFrame(np.zeros((len(assetInfo.values), 2)), index=assetInfo.values.index, columns=["bar", "gap"])
+        signals = pd.DataFrame(np.zeros((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
 
         if (self.start is not None):
-            scope = ppl.cropTime(assetInfo.values, self.start, self.end)
+            scope = ppl.cropTime(asset.values, self.start, self.end)
         else:
-            scope = assetInfo.values
+            scope = asset.values
 
         sig = signals.loc[scope.index][1:]
         sig["bar"] = np.negative(np.sign((scope["Close"] - scope["Open"]).values[:-1]))
         signals.loc[sig.index] = sig
 
-        return self.getDerivativeInfo(context, [assetInfo], [signals])
+        return self.update([asset], [signals])

@@ -12,9 +12,8 @@ class SellAndHold(Model):
         self.end = end
         return
 
-    # TODO : Handle list of assetInfos
-    def handleData(self, context, assetInfo):
-        Model.handleData(self, context, assetInfo)
+    def handleData(self, asset):
+        Model.handleData(self, asset)
 
         # Generate Signals and use them with asset values to calculate allocations
 
@@ -23,10 +22,10 @@ class SellAndHold(Model):
         #self.signals = pd.concat([self.signals, newSignals], join="outer", axis=0)
 
         if (self.start is not None):
-            signals = pd.DataFrame(np.zeros((len(assetInfo.values), 2)), index=assetInfo.values.index, columns=["bar", "gap"])
+            signals = pd.DataFrame(np.zeros((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
             signals.ix[ppl.cropTime(signals, self.start, self.end).index] = -1
             signals["gap"] = 0
         else:
-            signals = pd.DataFrame(np.ones((len(assetInfo.values), 2)), index=assetInfo.values.index, columns=["bar", "gap"])
+            signals = pd.DataFrame(np.ones((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
 
-        return self.getDerivativeInfo(context, [assetInfo], [signals])
+        return self.update([asset], [signals])

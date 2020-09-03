@@ -22,17 +22,17 @@ def getPeriodReturns(returns):
 # Helper method to pretty print derviative performance
 
 
-def plot(dInfo, baseline=None, log=False, includeComponents=False, includePrimary=True, custom=[]):
+def plot(derivative, baseline=None, log=False, includeComponents=False, includePrimary=True, custom=[]):
 
     assets = []
 
     # Add component asset returns
     if (includeComponents):
-        assets = dInfo.assets[:]
+        assets = derivative.assets[:]
 
     # Add primary returns
     if (includePrimary):
-        assets.append(dInfo)
+        assets.append(derivative)
 
     # Add baseline
     if (baseline is not None):
@@ -74,14 +74,14 @@ def plot(dInfo, baseline=None, log=False, includeComponents=False, includePrimar
     return fig, ax
 
 
-def displaySummary(dInfo, tInfo, baseline=None, log=False, includeComponents=True, includePrimary=True, full=True):
-    print("Derivative name : " + dInfo.name)
-    print("Number of assets : " + str(len(dInfo.assets)))
+def displaySummary(derivative, tInfo, baseline=None, log=False, includeComponents=True, includePrimary=True, full=True):
+    print("Derivative name : " + derivative.name)
+    print("Number of assets : " + str(len(derivative.assets)))
     if (baseline is not None):
         print("Baseline name : " + baseline.name)
 
     # Summary plot
-    plot(dInfo, baseline, log, includeComponents, includePrimary)
+    plot(derivative, baseline, log, includeComponents, includePrimary)
 
     # Show sample of trades
     pd.set_option('display.max_rows', 10)
@@ -89,9 +89,34 @@ def displaySummary(dInfo, tInfo, baseline=None, log=False, includeComponents=Tru
 
     if (baseline is not None):
         # Show local statistics
-        stats.merton(dInfo.returns["Open"][dInfo.returns["Open"] != 0], baseline.returns["Open"][baseline.returns["Open"] != 0], display=True)
+        stats.merton(derivative.returns["Open"][derivative.returns["Open"] != 0], baseline.returns["Open"][baseline.returns["Open"] != 0], display=True)
 
     if(full):
         # Show generic statistics
         warnings.filterwarnings('ignore')
-        pyfolio.create_returns_tear_sheet(getPeriodReturns(dInfo.returns))
+        pyfolio.create_returns_tear_sheet(getPeriodReturns(derivative.returns))
+
+
+def getTradingInfo(derivative, startCapital=1):
+    ua = derivative.getUnderlyingAllocations() * startCapital
+    returns = pd.DataFrame(derivative.values.values, index=derivative.values.index, columns=[
+                           ["Capital", "Capital"], derivative.values.columns])
+    results = [returns * startCapital]
+    mkts = list(set(ua.columns.get_level_values(0)))
+
+    for l1 in mkts:
+        a = ua[l1].values.flatten()
+        b = np.roll(a, 1)
+        b[0] = 0
+        trade = pd.DataFrame(
+            (a - b).reshape(len(derivative.values), 2), index=ua[l1].index, columns=ua[l1].columns)
+        results.append(pd.concat([ua[l1], trade], keys=[
+                       "Allocation", "Trade"], axis=1))
+
+    mkts.insert(0, derivative.name)
+    results = pd.concat(results, keys=mkts, axis=1)
+
+    # Filter out non-trading periods
+    idx = pd.IndexSlice
+    return results[
+        (results.loc[:, idx[:, :, ['bar', 'gap']]] != 0).any(axis=1)]

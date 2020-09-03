@@ -23,10 +23,10 @@ class MIBasicModel(Model):
 
     # Generate Signals and use them with asset values to calculate allocations
     # TODO : Handle list of assetInfos
-    def handleData(self, context, assetInfo):
-        Model.handleData(self, context, assetInfo)
+    def handleData(self, asset):
+        Model.handleData(self, asset)
 
-        assetValues = assetInfo.values
+        assetValues = asset.values
 
         # Obtain the signals for the next n steps from the Market Insights API
         signals = pd.DataFrame(np.zeros((len(assetValues), 2)), index=assetValues.index, columns=["bar", "gap"])
@@ -34,7 +34,7 @@ class MIBasicModel(Model):
 
         signals.update(predictions)
 
-        return self.getDerivativeInfo(context, [assetInfo], [signals])
+        return self.update([asset], [signals])
 
     def getPredictions(self, start, end):
         predictions = self.miassembly.get_predictions_with_dataset_id(self.dataset_id, self.training_run_id, start=start, end=end)

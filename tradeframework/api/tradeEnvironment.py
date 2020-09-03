@@ -15,10 +15,7 @@ class TradeEnvironment():
         return
 
     def createPortfolio(self, name, optimizer=None):
-        return self.portfolio.createPortfolio(name, optimizer)
-
-    def createTradeEngine(self):
-        pass
+        return self.portfolio.addPortfolio(name, optimizer)
 
     def createModel(self, modelClass, modelName, args=()):
         modelInstance = getattr(md, modelClass)
@@ -30,14 +27,5 @@ class TradeEnvironment():
         optimizer = optInstance(optName, self, **opts)
         return optimizer
 
-    def handleData(self, context, assetInfo):
-        pass
-
-    def getTradingInfo(self, context, dInfo, startCapital=1):
-        pass
-
-
-class Context:
-
-    def __init__(self):
+    def handleData(self, asset):
         pass

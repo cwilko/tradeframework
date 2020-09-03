@@ -10,5 +10,5 @@ class Optimizer:
         self.name = name
         self.env = env
 
-    def getWeights(self, context, returns):
+    def getWeights(self, returns):
         pass

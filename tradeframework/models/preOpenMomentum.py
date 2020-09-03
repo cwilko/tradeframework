@@ -8,30 +8,25 @@ class PreOpenMomentum(Model):
         Model.__init__(self, name, env)
         return
 
-    # TODO : Handle list of assetInfos
-    def handleData(self, context, assetInfo):
-        Model.handleData(self, context, assetInfo)
+    def handleData(self, asset):
+        Model.handleData(self, asset)
 
         # Generate Signals and use them with asset values to calculate allocations
 
-        # Create context space
-        if self.name not in context:
-            context[self.name] = {}
-            context[self.name]['temp'] = {'data': pd.DataFrame(), 'currentSignal': Model.CASH}
+        context = {}
+        context['temp'] = {'data': pd.DataFrame(), 'currentSignal': Model.CASH}
 
-        assetValues = assetInfo.values
+        assetValues = asset.values
 
         # Extract the relevant asset information
-        context[self.name]['temp']['data'] = pd.concat([context[self.name]['temp']['data'], assetValues[(assetValues.index.hour == 16) & (
+        context['temp']['data'] = pd.concat([context['temp']['data'], assetValues[(assetValues.index.hour == 16) & (
             assetValues.index.minute == 00)].resample('B').agg({'Open': 'first'}).fillna(method='ffill').shift(1).dropna()])
 
         # Generate the signals for the next n steps
-        signals = assetValues.groupby(assetValues.index).apply(lambda x: gap_close_predict(x, context[self.name]['temp']))
+        signals = assetValues.groupby(assetValues.index).apply(lambda x: gap_close_predict(x, context['temp']))
         #self.signals = pd.concat([self.signals, newSignals], join="outer", axis=0)
 
-        del context[self.name]['temp']
-
-        return self.getDerivativeInfo(context, [assetInfo], [signals])
+        return self.update([asset], [signals])
 
 # Whichever direction the market has moved by morning EST, trade in the same direction until the close.
 
