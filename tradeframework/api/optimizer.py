@@ -1,7 +1,8 @@
 
-# ======================          
+# ======================
 # Optimizer Class
 # ======================
+
 
 class Optimizer:
 
@@ -11,4 +12,3 @@ class Optimizer:
 
     def getWeights(self, context, returns):
         pass
-        
