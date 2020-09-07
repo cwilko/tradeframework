@@ -33,6 +33,8 @@ setup(
 
     install_requires=requirements,
 
+    # dependency_links=['-e git+https://github.com/cwilko/quantutils#egg=quantutils'],
+
     # You can just specify package directories manually here if your project is
     # simple. Or you can use find_packages().
     #

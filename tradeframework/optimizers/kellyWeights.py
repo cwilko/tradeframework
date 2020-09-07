@@ -13,7 +13,7 @@ class KellyOptimizer(Optimizer):
         self.weight = weight
         return
 
-    def getWeights(self, context, returns):
+    def getWeights(self, returns):
         pReturns = np.array([tradeUtils.getPeriodReturns(ret).values.flatten() for ret in returns])
 
         if (self.window is None):

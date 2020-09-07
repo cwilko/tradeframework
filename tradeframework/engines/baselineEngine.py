@@ -1,7 +1,7 @@
 # ======================
 # SpreadsEngine Class
 # ======================
-from tradeframework.api import TradeEngine, DerivativeInfo
+from tradeframework.api import TradeEngine
 import pandas as pd
 import numpy as np
 
@@ -14,9 +14,9 @@ class BaselineEngine(TradeEngine):
     # Calculate portfolio returns
     # f(Pout, A) => R
     # R1 = P1(A2 - A1) / D1
-    def getReturns(self, assetValues):
+    def calculateReturns(self, asset):
 
-        assetValues_flat = assetValues[['Open', 'Close']].values.flatten()
+        assetValues_flat = asset[['Open', 'Close']].values.flatten()
 
         pd.set_option('precision', 10)
         #s1 = allocations.iloc[:,::2]
@@ -35,16 +35,16 @@ class BaselineEngine(TradeEngine):
         #self.returns = pd.concat([self.returns, newReturns], join="outer", axis=0)
 
         # Unravel
-        returns = pd.DataFrame((returns_flat.reshape(assetValues.shape)), index=assetValues.index, columns=assetValues.columns)
+        returns = pd.DataFrame((returns_flat.reshape(asset.shape)), index=asset.index, columns=asset.columns)
 
         return returns
 
     # f(Pin,A) => Pout, D
-    def getDerivativeInfo(self, name, assetInfos, assetWeights):
+    def updateDerivative(self, assets, assetWeights):
 
         # Iterate over table. Construct deriviative value and relevant allocation.
         # (ref: Short Sell and Hold phenomenon)
-        assetValues = np.array([assetInfo.values[['Open', 'Close']].values.flatten() for assetInfo in assetInfos]).T
+        assetValues = np.array([asset.values[['Open', 'Close']].values.flatten() for asset in assets]).T
         weights = np.array([weights.values.flatten() for weights in assetWeights]).T
         noOfValues = len(assetValues)
         dValues = [1]
@@ -57,12 +57,12 @@ class BaselineEngine(TradeEngine):
         allocations.append(weights[i - 1] * dValues[i - 1] / assetValues[i - 1])  # Used in online "mode" for next time we call this
 
         # m x n x 2 matrices
-        columns = pd.MultiIndex.from_product([[assetInfo.name for assetInfo in assetInfos], ["bar", "gap"]])
+        columns = pd.MultiIndex.from_product([[asset.name for asset in assets], ["bar", "gap"]])
         dAllocations = pd.DataFrame(np.hstack([x.reshape(len(assetWeights[0]), 2) for x in np.array(allocations).T]), index=assetWeights[0].index, columns=columns)
         dWeights = pd.DataFrame(np.hstack([x.reshape(len(assetWeights[0]), 2) for x in np.array(weights).T]), index=assetWeights[0].index, columns=columns)
 
         # n x 2 matrices
         dValues = pd.DataFrame(np.array(dValues).reshape(assetWeights[0].shape), index=assetWeights[0].index, columns=['Open', 'Close'])
-        dReturns = self.getReturns(dValues)
+        dReturns = self.calculateReturns(dValues)
 
-        return DerivativeInfo(name, dValues, dAllocations, dWeights, dReturns, assetInfos)
+        return [dValues, dAllocations, dWeights, dReturns, assets]

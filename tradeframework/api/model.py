@@ -13,6 +13,3 @@ class Model(Derivative):
 
     def __init__(self, name, env):
         Derivative.__init__(self, name, env)
-
-    def handleData(self, context, assetInfo):
-        return Derivative.handleData(self, context, assetInfo)

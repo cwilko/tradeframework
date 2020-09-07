@@ -10,7 +10,7 @@ class EqualWeightsOptimizer(Optimizer):
         self.weight = weight
         return
 
-    def getWeights(self, context, returns):
+    def getWeights(self, returns):
         # Equal Weighting
         n = len(returns)
         F = np.ones(returns[0].shape) / n
