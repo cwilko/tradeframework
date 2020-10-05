@@ -65,4 +65,4 @@ class BaselineEngine(TradeEngine):
         dValues = pd.DataFrame(np.array(dValues).reshape(assetWeights[0].shape), index=assetWeights[0].index, columns=['Open', 'Close'])
         dReturns = self.calculateReturns(dValues)
 
-        return [dValues, dAllocations, dWeights, dReturns, assets]
+        return [dValues, dAllocations, dWeights, dReturns]

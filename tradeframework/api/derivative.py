@@ -26,7 +26,7 @@ class Derivative(Asset):
         # Update allocations using TradeEngine
 
         # TODO: Merge with current contents
-        self.values, self.uAllocations, self.weights, self.returns, self.assets = \
+        self.values, self.uAllocations, self.weights, self.returns = \
             self.env.tradeEngine.updateDerivative(assets, weights)
 
         return self
