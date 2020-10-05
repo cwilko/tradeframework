@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tradeframework.api import Model
+from tradeframework.api import Model, append_asset
 import quantutils.dataset.pipeline as ppl
 
 
@@ -12,6 +12,7 @@ class SellAndHold(Model):
         self.end = end
         return
 
+    @append_asset
     def handleData(self, asset):
         Model.handleData(self, asset)
 

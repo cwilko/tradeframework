@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tradeframework.api import Model
+from tradeframework.api import Model, append_asset
 
 import quantutils.dataset.pipeline as ppl
 
@@ -14,6 +14,7 @@ class MeanReversion(Model):
         self.env
         return
 
+    @append_asset
     def handleData(self, asset):
         Model.handleData(self, asset)
 
@@ -24,8 +25,8 @@ class MeanReversion(Model):
         else:
             scope = asset.values
 
-        sig = signals.loc[scope.index][1:]
-        sig["bar"] = np.negative(np.sign((scope["Close"] - scope["Open"]).values[:-1]))
+        sig = signals.loc[scope.index]
+        sig["bar"] = np.negative(np.sign((asset.values["Close"] - asset.values["Open"]).shift(1).loc[scope.index]))
         signals.loc[sig.index] = sig
 
         return self.update([asset], [signals])

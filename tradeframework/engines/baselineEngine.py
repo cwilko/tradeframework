@@ -1,7 +1,7 @@
 # ======================
 # SpreadsEngine Class
 # ======================
-from tradeframework.api import TradeEngine
+from tradeframework.api import TradeEngine, Derivative
 import pandas as pd
 import numpy as np
 
@@ -10,6 +10,7 @@ class BaselineEngine(TradeEngine):
 
     def _init_(self, name, txMgr):
         TradeEngine._init_(self, name, txMgr)
+        pd.set_option('precision', 10)
 
     # Calculate portfolio returns
     # f(Pout, A) => R
@@ -18,7 +19,6 @@ class BaselineEngine(TradeEngine):
 
         assetValues_flat = asset[['Open', 'Close']].values.flatten()
 
-        pd.set_option('precision', 10)
         #s1 = allocations.iloc[:,::2]
         #s2 = allocations.iloc[:,1::2]
         #s2.columns = s1.columns
@@ -54,7 +54,7 @@ class BaselineEngine(TradeEngine):
             allocations.append(weights[i - 1] * dValues[i - 1] / assetValues[i - 1])
             dValues.append(dValues[i - 1] + sum(allocations[i - 1] * (assetValues[i] - assetValues[i - 1])))
 
-        allocations.append(weights[i - 1] * dValues[i - 1] / assetValues[i - 1])  # Used in online "mode" for next time we call this
+        allocations.append(weights[i] * dValues[i] / assetValues[i])  # Used in online "mode" for next time we call this
 
         # m x n x 2 matrices
         columns = pd.MultiIndex.from_product([[asset.name for asset in assets], ["bar", "gap"]])

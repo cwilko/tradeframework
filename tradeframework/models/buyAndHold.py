@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tradeframework.api import Model
+from tradeframework.api import Model, append_asset
 import quantutils.dataset.pipeline as ppl
 
 
@@ -13,8 +13,8 @@ class BuyAndHold(Model):
         return
 
     # TODO : Handle list of assetInfos
+    @append_asset
     def handleData(self, asset):
-        Model.handleData(self, asset)
 
         # Generate Signals and use them with asset values to calculate allocations
 
