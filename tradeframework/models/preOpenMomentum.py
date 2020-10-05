@@ -1,5 +1,5 @@
 import pandas as pd
-from tradeframework.api import Model, append_asset
+from tradeframework.api import Model
 
 
 class PreOpenMomentum(Model):
@@ -8,9 +8,7 @@ class PreOpenMomentum(Model):
         Model.__init__(self, name, env)
         return
 
-    @append_asset
-    def handleData(self, asset):
-        Model.handleData(self, asset)
+    def getSignals(self, asset):
 
         # Generate Signals and use them with asset values to calculate allocations
 
@@ -27,7 +25,7 @@ class PreOpenMomentum(Model):
         signals = assetValues.groupby(assetValues.index).apply(lambda x: gap_close_predict(x, context['temp']))
         #self.signals = pd.concat([self.signals, newSignals], join="outer", axis=0)
 
-        return self.update([asset], [signals])
+        return signals
 
 # Whichever direction the market has moved by morning EST, trade in the same direction until the close.
 

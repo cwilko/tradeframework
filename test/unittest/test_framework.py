@@ -2,7 +2,7 @@ import unittest
 import os
 import pandas as pd
 import numpy as np
-from tradeframework.api import Asset, Model, append_asset
+from tradeframework.api import Asset, Model
 from tradeframework.environments import SandboxEnvironment
 
 dir = os.path.dirname(os.path.abspath(__file__))
@@ -17,16 +17,15 @@ class FrameworkTest(unittest.TestCase):
 
         class BuyAndHoldModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.ones((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
         p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
         p.addModel(BuyAndHoldModel("TestModel", env))
-        dInfo = env.handleData(self.asset1)
+        dInfo = env.append(self.asset1)
 
         # Calculate returns manually
         mRet = np.diff(self.asset1.values["Close"]) / self.asset1.values["Close"][:-1]
@@ -37,16 +36,15 @@ class FrameworkTest(unittest.TestCase):
 
         class SellAndHoldModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(0 - np.ones((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
         p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
         p.addModel(SellAndHoldModel("TestModel", env))
-        dInfo = env.handleData(self.asset1)
+        dInfo = env.append(self.asset1)
 
         # Calculate returns manually
         mRet = (0 - np.diff(self.asset1.values["Close"])) / self.asset1.values["Close"][:-1]
@@ -60,16 +58,15 @@ class FrameworkTest(unittest.TestCase):
 
         class RandomModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([np.zeros(len(randomSignals)), randomSignals]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
         p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
         p.addModel(RandomModel("SellAndHold", env))
-        dInfo = env.handleData(self.asset1)
+        dInfo = env.append(self.asset1)
 
         # Calculate returns manually
         mRet = randomSignals[:-1] * np.diff(self.asset1.values["Close"]) / self.asset1.values["Close"][:-1]
@@ -83,10 +80,9 @@ class FrameworkTest(unittest.TestCase):
 
         class RandomModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), randomSignals[:len(asset.values)]]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
@@ -94,7 +90,7 @@ class FrameworkTest(unittest.TestCase):
         p.addModel(RandomModel("SellAndHold", env))
 
         for i in range(len(self.asset1.values)):
-            env.handleData(Asset("DOW", self.asset1.values[i:i + 1]))
+            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
 
         # Calculate returns manually
         mRet = randomSignals[:-1] * np.diff(self.asset1.values["Close"]) / self.asset1.values["Close"][:-1]
@@ -105,27 +101,25 @@ class FrameworkTest(unittest.TestCase):
 
         class BuyAndHoldModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), np.ones(len(asset.values))]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
         randomSignals = np.array([1, 1, 0, -1, 0, -1, 1, -1, 0])
 
         class RandomModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([np.zeros(len(randomSignals)), randomSignals]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
         p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
         p.addModel(BuyAndHoldModel("TestModel", env))
         p.addModel(RandomModel("TestModel2", env))
-        dInfo = env.handleData(self.asset1)
+        dInfo = env.append(self.asset1)
 
         # Test returns were calculated correctly
         self.assertTrue(np.allclose(dInfo.returns.values[:, 1][:-1], np.array([-.2, .1, -.1, .0, -.1, .0, -.2, .0])))
@@ -139,20 +133,18 @@ class FrameworkTest(unittest.TestCase):
 
         class BuyAndHoldModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), np.ones(len(asset.values))]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
         randomSignals = np.array([1, 1, 0, -1, 0, -1, 1, -1, 0])
 
         class RandomModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), randomSignals[:len(asset.values)]]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
@@ -161,7 +153,7 @@ class FrameworkTest(unittest.TestCase):
         p.addModel(RandomModel("TestModel2", env))
 
         for i in range(len(self.asset1.values)):
-            env.handleData(Asset("DOW", self.asset1.values[i:i + 1]))
+            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
 
         # Test returns were calculated correctly
         self.assertTrue(np.allclose(p.returns.values[:, 1][:-1], np.array([-.2, .1, -.1, .0, -.1, .0, -.2, .0])))
@@ -178,16 +170,15 @@ class FrameworkTest(unittest.TestCase):
 
         class RandomModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([randomSignals, randomSignals]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
         p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellylWeights"))
         p.addModel(RandomModel("TestModel", env))
-        env.handleData(self.asset1)
+        env.append(self.asset1)
 
         self.assertTrue(np.allclose(
             p.getAsset("TestModel").getAllocations()["DOW"]["gap"].values.flatten(),
@@ -204,10 +195,9 @@ class FrameworkTest(unittest.TestCase):
 
         class RandomModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), randomSignals[:len(asset.values)]]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
@@ -215,7 +205,7 @@ class FrameworkTest(unittest.TestCase):
         p.addModel(RandomModel("TestModel", env))
 
         for i in range(len(self.asset1.values)):
-            env.handleData(Asset("DOW", self.asset1.values[i:i + 1]))
+            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
 
         self.assertTrue(np.allclose(
             p.getAsset("TestModel").getAllocations()["DOW"]["gap"].values.flatten(),
@@ -229,27 +219,25 @@ class FrameworkTest(unittest.TestCase):
 
         class BuyAndHoldModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.ones((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
         randomSignals = np.array([-1, 1, -1, 1, -1, 1, -1, 1, -1])
 
         class RandomModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([randomSignals, randomSignals]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
         p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellylWeights", opts={"window": 4}))
         p.addModel(BuyAndHoldModel("TestModel", env))
         p.addModel(RandomModel("TestModel2", env))
-        env.handleData(self.asset1)
+        env.append(self.asset1)
 
         self.assertTrue(np.allclose(
             p.returns["Close"].values.flatten(),
@@ -259,20 +247,18 @@ class FrameworkTest(unittest.TestCase):
 
         class BuyAndHoldModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.ones((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
         randomSignals = np.array([-1, 1, -1, 1, -1, 1, -1, 1, -1])
 
         class RandomModel(Model):
 
-            @append_asset
-            def handleData(self, asset):
+            def getSignals(self, asset):
                 signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), randomSignals[:len(asset.values)]]).T, index=asset.values.index, columns=["bar", "gap"])
-                return self.update([asset], [signals])
+                return signals
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
@@ -281,7 +267,7 @@ class FrameworkTest(unittest.TestCase):
         p.addModel(RandomModel("TestModel2", env))
 
         for i in range(len(self.asset1.values)):
-            env.handleData(Asset("DOW", self.asset1.values[i:i + 1]))
+            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
 
         self.assertTrue(np.allclose(
             p.returns["Close"].values.flatten(),

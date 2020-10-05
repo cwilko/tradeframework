@@ -19,7 +19,7 @@ class Derivative(Asset):
         else:
             self.assets = assets
 
-    def handleData(self, asset):
+    def append(self, asset):
         pass
 
     def update(self, assets, weights):

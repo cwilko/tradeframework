@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tradeframework.api import Model, append_asset
+from tradeframework.api import Model
 
 import quantutils.model.utils as mlutils
 import quantutils.dataset.pipeline as ppl
@@ -23,9 +23,7 @@ class MIBasicModel(Model):
 
     # Generate Signals and use them with asset values to calculate allocations
     # TODO : Handle list of assetInfos
-    @append_asset
-    def handleData(self, asset):
-        Model.handleData(self, asset)
+    def getSignals(self, asset):
 
         assetValues = asset.values
 
@@ -35,7 +33,7 @@ class MIBasicModel(Model):
 
         signals.update(predictions)
 
-        return self.update([asset], [signals])
+        return signals
 
     def getPredictions(self, start, end):
         predictions = self.miassembly.get_predictions_with_dataset_id(self.dataset_id, self.training_run_id, start=start, end=end)

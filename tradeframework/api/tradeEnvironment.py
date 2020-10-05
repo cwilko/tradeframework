@@ -27,5 +27,5 @@ class TradeEnvironment():
         optimizer = optInstance(optName, self, **opts)
         return optimizer
 
-    def handleData(self, asset):
+    def append(self, asset):
         pass

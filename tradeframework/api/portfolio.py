@@ -24,10 +24,10 @@ class Portfolio(Derivative):
         self.assets.append(model)
         return model
 
-    def handleData(self, asset):
+    def append(self, asset):
 
         # Update all children
-        derivatives = [derivative.handleData(asset) for derivative in self.assets]
+        derivatives = [derivative.append(asset) for derivative in self.assets]
 
         # Calculate portfolio allocation
         weights = self.optimizer.getWeights([derivative.returns for derivative in derivatives])
