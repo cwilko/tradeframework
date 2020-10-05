@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tradeframework.api import Model, append_asset
+from tradeframework.api import Model
 import quantutils.dataset.pipeline as ppl
 
 
@@ -12,9 +12,7 @@ class SellAndHold(Model):
         self.end = end
         return
 
-    @append_asset
-    def handleData(self, asset):
-        Model.handleData(self, asset)
+    def getSignals(self, asset):
 
         # Generate Signals and use them with asset values to calculate allocations
 
@@ -29,4 +27,4 @@ class SellAndHold(Model):
         else:
             signals = pd.DataFrame(np.ones((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
 
-        return self.update([asset], [signals])
+        return signals

@@ -1,5 +1,6 @@
 from . import Derivative
 
+
 # ======================
 # Model Class
 # ======================
@@ -14,11 +15,16 @@ class Model(Derivative):
     def __init__(self, name, env):
         Derivative.__init__(self, name, env)
 
-
-def append_asset(func):
-    def wrapper(self, asset):
-        # This only works if you have one asset, and only if the Model has Assets as children (rather than Derivatives)
+    def append(self, asset):
+        # This only works if you have one asset, and only if the Model has Assets as children (rather than Derivative)
         if (len(self.assets) > 0):
-            asset = self.assets[0].append(asset)
-        return func(self, asset)
-    return wrapper
+            self.assets[0].append(asset)
+        else:
+            self.assets = [asset]
+
+        # TODO pass a window rather than all asset data
+        return self.update(self.assets, [self.getSignals(self.assets[0])])
+
+    # Method for calculating the signals associated with input asset values
+    def getSignals(self, asset):
+        pass

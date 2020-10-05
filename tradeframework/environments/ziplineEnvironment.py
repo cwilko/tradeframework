@@ -13,6 +13,6 @@ class ZiplineEnvironment(TradeEnvironment):
         TradeEnvironment.__init__(self, name)
         return
 
-    def handleData(self, asset):
+    def append(self, asset):
         # Mediate between our Portfolio and the Environment
-        return self.portfolio.handleData(asset)
+        return self.portfolio.append(asset)

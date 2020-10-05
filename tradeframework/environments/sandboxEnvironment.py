@@ -15,7 +15,7 @@ class SandboxEnvironment(TradeEnvironment):
         TradeEnvironment.__init__(self, name)
         self.tradeEngine = BaselineEngine("Sandbox Engine", SpreadsTxMgr())
 
-    def handleData(self, asset):
-        TradeEnvironment.handleData(self, asset)
+    def append(self, asset):
+        TradeEnvironment.append(self, asset)
         # Mediate between our Portfolio and the Environment
-        return self.portfolio.handleData(asset)
+        return self.portfolio.append(asset)
