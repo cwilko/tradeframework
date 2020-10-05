@@ -1,5 +1,5 @@
 import pandas as pd
-from tradeframework.api import Model
+from tradeframework.api import Model, append_asset
 
 
 class PreOpenMomentum(Model):
@@ -8,6 +8,7 @@ class PreOpenMomentum(Model):
         Model.__init__(self, name, env)
         return
 
+    @append_asset
     def handleData(self, asset):
         Model.handleData(self, asset)
 

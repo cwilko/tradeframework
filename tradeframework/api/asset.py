@@ -8,7 +8,7 @@ import pandas as pd
 
 class Asset:
 
-    def __init__(self, name, values=[]):
+    def __init__(self, name, values=None):
         self.name = name
         self.values = values
 
@@ -16,8 +16,15 @@ class Asset:
         return self.name
 
     def getValues(self):
-        return self.allocations
+        return self.values
 
     def getUnderlyingAllocations(self):
         return pd.DataFrame(np.ones((len(self.values), 2)), columns=[
             [self.name, self.name], ['bar', 'gap']], index=self.values.index)
+
+    def append(self, asset):
+        if self.values is None:
+            self.values = asset.values
+        else:
+            self.values = self.values.combine_first(asset.values)
+        return self

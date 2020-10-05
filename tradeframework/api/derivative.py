@@ -8,19 +8,24 @@ import pandas as pd
 
 class Derivative(Asset):
 
-    def __init__(self, name, env):
-        Asset.__init__(self, name)
+    def __init__(self, name, env, values=None, uAllocations=None, weights=None, returns=None, assets=None):
+        Asset.__init__(self, name, values)
         self.env = env
-        self.uAllocations = None
-        self.weights = None
-        self.returns = None
-        self.assets = []
+        self.uAllocations = uAllocations
+        self.weights = weights
+        self.returns = returns
+        if (assets is None):
+            self.assets = []
+        else:
+            self.assets = assets
 
-    def handleData(self, assetInfo):
+    def handleData(self, asset):
         pass
 
     def update(self, assets, weights):
         # Update allocations using TradeEngine
+
+        # TODO: Merge with current contents
         self.values, self.uAllocations, self.weights, self.returns, self.assets = \
             self.env.tradeEngine.updateDerivative(assets, weights)
 
