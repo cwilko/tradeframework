@@ -73,15 +73,38 @@ class FrameworkTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(dInfo.returns.values[:, 1][:-1], mRet.values))
 
+    def test_buyAndHold_singleModel_online(self):
+
+        class BuyAndHoldModel(Model):
+
+            def getSignals(self, asset):
+                signals = pd.DataFrame(np.ones((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
+                return signals
+
+        # Calculate returns via TradeFramework
+        env = SandboxEnvironment("TradeFair")
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
+        p.addModel(BuyAndHoldModel("TestModel", env))
+
+        for i in range(len(self.asset1.values)):
+            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
+
+        # Calculate returns manually
+        mRet = np.diff(self.asset1.values["Close"]) / self.asset1.values["Close"][:-1]
+
+        self.assertTrue(np.allclose(p.returns.values[:, 1][:-1], mRet.values))
+
     def test_buyAndSell_singleModel_online(self):
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
         randomSignals = np.array([1, 1, 0, -1, 0, -1, 1, -1, 0])
+        asset1 = self.asset1
 
         class RandomModel(Model):
 
             def getSignals(self, asset):
-                signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), randomSignals[:len(asset.values)]]).T, index=asset.values.index, columns=["bar", "gap"])
+                signals = pd.DataFrame(np.array([np.zeros(len(asset1.values)), randomSignals[:len(asset1.values)]]).T, index=asset1.values.index, columns=["bar", "gap"])
+                signals = signals[signals.index.to_series().isin(asset.values.index)]
                 return signals
 
         # Calculate returns via TradeFramework
@@ -139,11 +162,13 @@ class FrameworkTest(unittest.TestCase):
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
         randomSignals = np.array([1, 1, 0, -1, 0, -1, 1, -1, 0])
+        asset1 = self.asset1
 
         class RandomModel(Model):
 
             def getSignals(self, asset):
-                signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), randomSignals[:len(asset.values)]]).T, index=asset.values.index, columns=["bar", "gap"])
+                signals = pd.DataFrame(np.array([np.zeros(len(asset1.values)), randomSignals[:len(asset1.values)]]).T, index=asset1.values.index, columns=["bar", "gap"])
+                signals = signals[signals.index.to_series().isin(asset.values.index)]
                 return signals
 
         # Calculate returns via TradeFramework
@@ -192,11 +217,13 @@ class FrameworkTest(unittest.TestCase):
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
         randomSignals = np.array([-1, 1, -1, 1, -1, 1, -1, 1, -1])
+        asset1 = self.asset1
 
         class RandomModel(Model):
 
             def getSignals(self, asset):
-                signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), randomSignals[:len(asset.values)]]).T, index=asset.values.index, columns=["bar", "gap"])
+                signals = pd.DataFrame(np.array([np.zeros(len(asset1.values)), randomSignals[:len(asset1.values)]]).T, index=asset1.values.index, columns=["bar", "gap"])
+                signals = signals[signals.index.to_series().isin(asset.values.index)]
                 return signals
 
         # Calculate returns via TradeFramework
@@ -253,11 +280,13 @@ class FrameworkTest(unittest.TestCase):
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
         randomSignals = np.array([-1, 1, -1, 1, -1, 1, -1, 1, -1])
+        asset1 = self.asset1
 
         class RandomModel(Model):
 
             def getSignals(self, asset):
-                signals = pd.DataFrame(np.array([np.zeros(len(asset.values)), randomSignals[:len(asset.values)]]).T, index=asset.values.index, columns=["bar", "gap"])
+                signals = pd.DataFrame(np.array([np.zeros(len(asset1.values)), randomSignals[:len(asset1.values)]]).T, index=asset1.values.index, columns=["bar", "gap"])
+                signals = signals[signals.index.to_series().isin(asset.values.index)]
                 return signals
 
         # Calculate returns via TradeFramework
