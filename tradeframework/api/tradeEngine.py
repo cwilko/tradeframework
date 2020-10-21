@@ -18,5 +18,5 @@ class TradeEngine:
         pass
 
     # f(Pin,A) => Pout
-    def createDerivative(self, asset, weights):
+    def updateDerivative(self, asset, weights):
         pass

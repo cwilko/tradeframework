@@ -40,14 +40,14 @@ class BaselineEngine(TradeEngine):
         return returns
 
     # f(Pin,A) => Pout, D
-    def updateDerivative(self, assets, assetWeights):
+    def updateDerivative(self, assets, assetWeights, initial_dValue=1):
 
         # Iterate over table. Construct deriviative value and relevant allocation.
         # (ref: Short Sell and Hold phenomenon)
         assetValues = np.array([asset.values[['Open', 'Close']].values.flatten() for asset in assets]).T
         weights = np.array([weights.values.flatten() for weights in assetWeights]).T
         noOfValues = len(assetValues)
-        dValues = [1]
+        dValues = [initial_dValue]
         allocations = []
         for i in range(1, noOfValues):
             # TODO : Add Rebalancing support. Currently rebalance on every bar & gap.
@@ -65,4 +65,4 @@ class BaselineEngine(TradeEngine):
         dValues = pd.DataFrame(np.array(dValues).reshape(assetWeights[0].shape), index=assetWeights[0].index, columns=['Open', 'Close'])
         dReturns = self.calculateReturns(dValues)
 
-        return [dValues, dAllocations, dWeights, dReturns, assets]
+        return [dValues, dAllocations, dWeights, dReturns]

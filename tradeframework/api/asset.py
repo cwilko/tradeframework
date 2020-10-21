@@ -26,5 +26,5 @@ class Asset:
         if self.values is None:
             self.values = asset.values
         else:
-            self.values = self.values.combine_first(asset.values)
+            self.values = asset.values.combine_first(self.values)
         return self

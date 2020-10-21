@@ -27,10 +27,10 @@ class Portfolio(Derivative):
     def append(self, asset):
 
         # Update all children
-        derivatives = [derivative.append(asset) for derivative in self.assets]
+        self.assets = [derivative.append(asset) for derivative in self.assets]
 
         # Calculate portfolio allocation
-        weights = self.optimizer.getWeights([derivative.returns for derivative in derivatives])
+        weights = self.optimizer.getWeights([derivative.returns for derivative in self.assets])
 
         # Update derivative state
-        return self.update(derivatives, weights)
+        return self.update(self.assets, weights)
