@@ -22,14 +22,16 @@ class MIAggregateModel(Model):
         return
 
     # Generate Signals and use them with asset values to calculate allocations
-    # TODO : Handle list of assetInfos
-    def getSignals(self, asset):
+    def getSignals(self, idx=0):
 
-        assetValues = asset.values
-        signals = pd.DataFrame(np.zeros((len(assetValues), 2)), index=assetValues.index, columns=["bar", "gap"])
+        # Extract window from the data
+        # TODO : Handle list of assetInfos
+        window = self.assets[0].values[idx:]
+
+        signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
 
         # Obtain the signals for the next n steps from the Market Insights api
-        predictions = self.getPredictions(assetValues.index[0].isoformat(), assetValues.index[-1].isoformat())
+        predictions = self.getPredictions(window.index[0].isoformat(), window.index[-1].isoformat())
 
         signals.update(predictions)
 
