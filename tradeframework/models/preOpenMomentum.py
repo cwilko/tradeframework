@@ -8,21 +8,23 @@ class PreOpenMomentum(Model):
         Model.__init__(self, name, env)
         return
 
-    def getSignals(self, asset):
+    # Generate Signals and use them with asset values to calculate allocations
+    def getSignals(self, idx=0):
 
-        # Generate Signals and use them with asset values to calculate allocations
+        # Extract window from the data
+        # TODO : Handle list of assetInfos
+        # TODO: ADD WINDOW SUPPORT
+        window = self.assets[0].values[idx:]
 
         context = {}
         context['temp'] = {'data': pd.DataFrame(), 'currentSignal': Model.CASH}
 
-        assetValues = asset.values
-
         # Extract the relevant asset information
-        context['temp']['data'] = pd.concat([context['temp']['data'], assetValues[(assetValues.index.hour == 16) & (
-            assetValues.index.minute == 00)].resample('B').agg({'Open': 'first'}).fillna(method='ffill').shift(1).dropna()])
+        context['temp']['data'] = pd.concat([context['temp']['data'], window[(window.index.hour == 16) & (
+            window.index.minute == 00)].resample('B').agg({'Open': 'first'}).fillna(method='ffill').shift(1).dropna()])
 
         # Generate the signals for the next n steps
-        signals = assetValues.groupby(assetValues.index).apply(lambda x: gap_close_predict(x, context['temp']))
+        signals = window.groupby(window.index).apply(lambda x: gap_close_predict(x, context['temp']))
         #self.signals = pd.concat([self.signals, newSignals], join="outer", axis=0)
 
         return signals

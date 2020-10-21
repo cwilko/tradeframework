@@ -10,10 +10,11 @@ class EqualWeightsOptimizer(Optimizer):
         self.weight = weight
         return
 
-    def getWeights(self, returns):
+    def getWeights(self, returns, idx=0):
+
         # Equal Weighting
         n = len(returns)
-        F = np.ones(returns[0].shape) / n
+        F = np.ones(returns[0][idx:].shape) / n
         F = F * self.weight
 
-        return [pd.DataFrame(F, index=returns[0].index, columns=returns[0].columns) for _ in returns]
+        return [pd.DataFrame(F, index=returns[0][idx:].index, columns=returns[0].columns) for _ in returns]

@@ -15,54 +15,63 @@ class BaselineEngine(TradeEngine):
     # Calculate portfolio returns
     # f(Pout, A) => R
     # R1 = P1(A2 - A1) / D1
-    def calculateReturns(self, asset):
+    def calculateReturns(self, assetValues):
 
-        assetValues_flat = asset[['Open', 'Close']].values.flatten()
-
-        #s1 = allocations.iloc[:,::2]
-        #s2 = allocations.iloc[:,1::2]
-        #s2.columns = s1.columns
+        # s1 = allocations.iloc[:,::2]
+        # s2 = allocations.iloc[:,1::2]
+        # s2.columns = s1.columns
 
         # Returns (Bar and Gap)
-        returns_flat = np.diff(assetValues_flat) / assetValues_flat[:-1]
-        returns_flat = np.append(returns_flat, 0)
+        returns = np.diff(assetValues) / assetValues[:-1]
 
         # Transaction Costs
-        #tx1 = s1.sub(s2.shift(1)).abs().multiply((0 / data.Open), axis=0) - 1
-        #tx2 = s2.sub(s1).abs().multiply((0 / data.Close), axis=0) - 1
-
-        # Concatenate with history
-        #self.returns = pd.concat([self.returns, newReturns], join="outer", axis=0)
-
-        # Unravel
-        returns = pd.DataFrame((returns_flat.reshape(asset.shape)), index=asset.index, columns=asset.columns)
+        # tx1 = s1.sub(s2.shift(1)).abs().multiply((0 / data.Open), axis=0) - 1
+        # tx2 = s2.sub(s1).abs().multiply((0 / data.Close), axis=0) - 1
 
         return returns
 
     # f(Pin,A) => Pout, D
-    def updateDerivative(self, assets, assetWeights, initial_dValue=1):
+    # TODO : Deal with updates after an Open but before Close.
+    def updateDerivative(self, derivative, assets, assetWeights, idx=0):
+
+        assetValues = np.array([asset.values[idx:][['Open', 'Close']].values.flatten() for asset in assets]).T
+        weights = np.array([weights.values.flatten() for weights in assetWeights]).T
+        noOfValues = len(assetValues)
+
+        # Bootstrap with any existing derivative info.
+
+        loc = -1
+        if (idx != 0):
+            loc = assets[0].values.index.get_loc(idx) - 1
+
+        if (loc >= 0):  # Not first index of our asset, therefore bootstrap from derivative
+            assetValues = np.insert(assetValues, 0, [asset.values.iloc[loc]["Close"] for asset in assets], axis=0)
+            dValues = [derivative.values.iloc[loc]["Close"]]
+            allocations = [[derivative.uAllocations.iloc[loc][asset.name]["gap"].tolist() for asset in assets]]
+        else:
+            # Bootstrap dummy values for new derivative
+            assetValues = np.insert(assetValues, 0, np.zeros(len(assets)), axis=0)
+            dValues = [1]
+            allocations = [np.zeros(len(assets))]
 
         # Iterate over table. Construct deriviative value and relevant allocation.
         # (ref: Short Sell and Hold phenomenon)
-        assetValues = np.array([asset.values[['Open', 'Close']].values.flatten() for asset in assets]).T
-        weights = np.array([weights.values.flatten() for weights in assetWeights]).T
-        noOfValues = len(assetValues)
-        dValues = [initial_dValue]
-        allocations = []
-        for i in range(1, noOfValues):
+        for i in range(1, noOfValues + 1):
             # TODO : Add Rebalancing support. Currently rebalance on every bar & gap.
-            allocations.append(weights[i - 1] * dValues[i - 1] / assetValues[i - 1])
-            dValues.append(dValues[i - 1] + sum(allocations[i - 1] * (assetValues[i] - assetValues[i - 1])))
 
-        allocations.append(weights[i] * dValues[i] / assetValues[i])  # Used in online "mode" for next time we call this
+            dValues.append(dValues[i - 1] + sum(allocations[i - 1] * (assetValues[i] - assetValues[i - 1])))
+            allocations.append(weights[i - 1] * dValues[i] / assetValues[i])
 
         # m x n x 2 matrices
         columns = pd.MultiIndex.from_product([[asset.name for asset in assets], ["bar", "gap"]])
-        dAllocations = pd.DataFrame(np.hstack([x.reshape(len(assetWeights[0]), 2) for x in np.array(allocations).T]), index=assetWeights[0].index, columns=columns)
+        dAllocations = pd.DataFrame(np.hstack([x.reshape(len(assetWeights[0]), 2) for x in np.array(allocations[1:]).T]), index=assetWeights[0].index, columns=columns)
+        # TODO: Why are we wrapping up weights again, just return original weights? or not at all?
         dWeights = pd.DataFrame(np.hstack([x.reshape(len(assetWeights[0]), 2) for x in np.array(weights).T]), index=assetWeights[0].index, columns=columns)
 
         # n x 2 matrices
-        dValues = pd.DataFrame(np.array(dValues).reshape(assetWeights[0].shape), index=assetWeights[0].index, columns=['Open', 'Close'])
         dReturns = self.calculateReturns(dValues)
+        dReturns = pd.DataFrame(np.array(dReturns).reshape(assetWeights[0].shape), index=assetWeights[0].index, columns=['Open', 'Close'])
+
+        dValues = pd.DataFrame(np.array(dValues[1:]).reshape(assetWeights[0].shape), index=assetWeights[0].index, columns=['Open', 'Close'])
 
         return [dValues, dAllocations, dWeights, dReturns]

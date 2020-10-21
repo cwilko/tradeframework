@@ -14,14 +14,20 @@ class RetraceDailyMove(Model):
         self.env
         return
 
-    def getSignals(self, asset):
+    # Generate Signals and use them with asset values to calculate allocations
+    def getSignals(self, idx=0):
 
-        signals = pd.DataFrame(np.zeros((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
+        # Extract window from the data
+        # TODO : Handle list of assetInfos
+        # TODO: ADD WINDOW SUPPORT
+        window = self.assets[0].values[idx:]
+
+        signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
 
         if (self.start is not None):
-            scope = ppl.cropTime(asset.values["Open"], self.start, self.end)
+            scope = ppl.cropTime(window["Open"], self.start, self.end)
         else:
-            scope = asset.values["Open"]
+            scope = window["Open"]
 
         sig = signals.loc[scope.index][1:]
         sig["bar"] = np.negative(np.sign(np.diff(scope)))

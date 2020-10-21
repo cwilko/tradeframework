@@ -12,19 +12,18 @@ class SellAndHold(Model):
         self.end = end
         return
 
-    def getSignals(self, asset):
+    # Generate Signals and use them with asset values to calculate allocations
+    def getSignals(self, idx=0):
 
-        # Generate Signals and use them with asset values to calculate allocations
-
-        # Generate the signals for the next n steps
-        #signals = data.groupby(data.index).apply(lambda x: gap_close_predict(x, context[self.name]['temp']))
-        #self.signals = pd.concat([self.signals, newSignals], join="outer", axis=0)
+        # Extract window from the data
+        # TODO : Handle list of assetInfos
+        window = self.assets[0].values[idx:]
 
         if (self.start is not None):
-            signals = pd.DataFrame(np.zeros((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
+            signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
             signals.ix[ppl.cropTime(signals, self.start, self.end).index] = -1
             signals["gap"] = 0
         else:
-            signals = pd.DataFrame(np.ones((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
+            signals = pd.DataFrame(np.negative(np.ones((len(window), 2))), index=window.index, columns=["bar", "gap"])
 
         return signals

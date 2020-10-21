@@ -19,20 +19,9 @@ class Derivative(Asset):
         else:
             self.assets = assets
 
-    def append(self, asset):
-        pass
+    def append(self, weights, idx=0):
 
-    def appendValues(self, var, vals):
-        if var is None:
-            var = vals
-        else:
-            var = var.combine_first(vals)
-        return self
-
-    def appendData(self, assets, weights, initial_value):
-
-        # TODO: Merge with current contents
-        values, uAllocations, weights, returns = self.env.tradeEngine.updateDerivative(assets, weights, initial_value)
+        values, uAllocations, weights, returns = self.env.tradeEngine.updateDerivative(self, self.assets, weights, idx)
 
         if self.values is None:
             self.values = values
@@ -44,15 +33,6 @@ class Derivative(Asset):
             self.uAllocations = uAllocations.combine_first(self.uAllocations)
             self.weights = weights.combine_first(self.weights)
             self.returns = returns.combine_first(self.returns)
-
-        return self
-
-    def update(self, assets, weights):
-        # Update allocations using TradeEngine
-
-        # TODO: Merge with current contents
-        self.values, self.uAllocations, self.weights, self.returns = \
-            self.env.tradeEngine.updateDerivative(assets, weights)
 
         return self
 

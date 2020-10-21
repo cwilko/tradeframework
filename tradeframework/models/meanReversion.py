@@ -14,17 +14,23 @@ class MeanReversion(Model):
         self.env
         return
 
-    def getSignals(self, asset):
+    # Generate Signals and use them with asset values to calculate allocations
+    def getSignals(self, idx=0):
 
-        signals = pd.DataFrame(np.zeros((len(asset.values), 2)), index=asset.values.index, columns=["bar", "gap"])
+        # Extract window from the data
+        # TODO : Handle list of assetInfos
+        # TODO: ADD WINDOW SUPPORT
+        window = self.assets[0].values[idx:]
+
+        signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
 
         if (self.start is not None):
-            scope = ppl.cropTime(asset.values, self.start, self.end)
+            scope = ppl.cropTime(window, self.start, self.end)
         else:
-            scope = asset.values
+            scope = window
 
         sig = signals.loc[scope.index]
-        sig["bar"] = np.negative(np.sign((asset.values["Close"] - asset.values["Open"]).shift(1).loc[scope.index]))
+        sig["bar"] = np.negative(np.sign((window["Close"] - window["Open"]).shift(1).loc[scope.index]))
         signals.loc[sig.index] = sig
 
         return signals
