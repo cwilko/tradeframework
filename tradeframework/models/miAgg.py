@@ -26,7 +26,7 @@ class MIAggregateModel(Model):
 
         # Extract window from the data
         # TODO : Handle list of assetInfos
-        window = self.assets[0].values[idx:]
+        window = self.getWindow(idx)
 
         signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
 

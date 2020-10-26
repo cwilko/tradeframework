@@ -6,6 +6,7 @@ class PreOpenMomentum(Model):
 
     def __init__(self, name, env):
         Model.__init__(self, name, env)
+        self.window = -1  # Use all data available
         return
 
     # Generate Signals and use them with asset values to calculate allocations
@@ -14,7 +15,7 @@ class PreOpenMomentum(Model):
         # Extract window from the data
         # TODO : Handle list of assetInfos
         # TODO: ADD WINDOW SUPPORT
-        window = self.assets[0].values[idx:]
+        window = self.getWindow(idx)
 
         context = {}
         context['temp'] = {'data': pd.DataFrame(), 'currentSignal': Model.CASH}
@@ -27,7 +28,7 @@ class PreOpenMomentum(Model):
         signals = window.groupby(window.index).apply(lambda x: gap_close_predict(x, context['temp']))
         #self.signals = pd.concat([self.signals, newSignals], join="outer", axis=0)
 
-        return signals
+        return signals[idx:]
 
 # Whichever direction the market has moved by morning EST, trade in the same direction until the close.
 

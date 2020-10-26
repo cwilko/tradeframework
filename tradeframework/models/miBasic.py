@@ -26,7 +26,7 @@ class MIBasicModel(Model):
 
         # Extract window from the data
         # TODO : Handle list of assetInfos
-        window = self.assets[0].values[idx:]
+        window = self.getWindow(idx)
 
         # Obtain the signals for the next n steps from the Market Insights API
         signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
@@ -34,7 +34,7 @@ class MIBasicModel(Model):
 
         signals.update(predictions)
 
-        return signals
+        return signals[idx:]
 
     def getPredictions(self, start, end):
         predictions = self.miassembly.get_predictions_with_dataset_id(self.dataset_id, self.training_run_id, start=start, end=end)

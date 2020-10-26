@@ -14,6 +14,7 @@ class Model(Derivative):
 
     def __init__(self, name, env):
         Derivative.__init__(self, name, env)
+        self.window = 0  # Default - No window
 
     def append(self, asset):
         # This only works if you have one asset, and only if the Model has Assets as children (rather than Derivatives)
@@ -27,3 +28,13 @@ class Model(Derivative):
     # Method for calculating the signals associated with input asset values
     def getSignals(self, asset):
         pass
+
+    def getWindow(self, idx):
+
+        if (self.window is -1):  # Use all available data
+            idx = 0
+        elif (idx is not 0):
+            idx = self.assets[0].values.index.get_loc(idx)
+            idx = max(0, idx - self.window)
+
+        return self.assets[0].values[idx:]

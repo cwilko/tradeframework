@@ -41,6 +41,29 @@ class FrameworkTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(dInfo.returns.values[:, 0][1:], mRet.values))
 
+    # Tests using a windowed model
+    def test_meanreversion_singleModel(self):
+
+        # Calculate returns via TradeFramework
+        env = SandboxEnvironment("TradeFair")
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
+        p.addModel(env.createModel("MeanReversion", "Test-MeanReversion"))
+        dInfo = env.append(self.asset1)
+
+        self.assertTrue(np.allclose(dInfo.returns["Open"].values.flatten(), [0., 0., 0.1, 0.2, 0.1, 0.2, 0.1, 0.2, 0.1]))
+
+    # Tests using a windowed model
+    def test_meanreversion_singleModel_online(self):
+
+        # Calculate returns via TradeFramework
+        env = SandboxEnvironment("TradeFair")
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
+        p.addModel(env.createModel("MeanReversion", "Test-MeanReversion"))
+        for i in range(len(self.asset1.values)):
+            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
+
+        self.assertTrue(np.allclose(p.returns["Open"].values.flatten(), [0., 0., 0.1, 0.2, 0.1, 0.2, 0.1, 0.2, 0.1]))
+
     def test_buyAndSell_singleModel(self):
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
