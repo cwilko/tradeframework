@@ -96,6 +96,8 @@ def displaySummary(derivative, tInfo, baseline=None, log=False, includeComponent
         warnings.filterwarnings('ignore')
         pyfolio.create_returns_tear_sheet(getPeriodReturns(derivative.returns))
 
+# Helper method to turn derivative signals into trading information (buy/sell amounts, capital, etc)
+
 
 def getTradingInfo(derivative, startCapital=1):
     ua = derivative.getUnderlyingAllocations() * startCapital

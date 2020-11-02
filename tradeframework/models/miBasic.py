@@ -11,13 +11,14 @@ from quantutils.api.assembly import MIAssembly
 
 class MIBasicModel(Model):
 
-    def __init__(self, name, env, credstore, dataset_id, training_run_id, threshold):
+    def __init__(self, name, env, credstore, dataset_id, training_run_id, threshold, debug=False):
         Model.__init__(self, name, env)
 
         self.miassembly = MIAssembly(MarketInsights(credstore), Functions(credstore))
         self.dataset_id = dataset_id
         self.training_run_id = training_run_id
         self.threshold = threshold
+        self.debug = debug
 
         return
 
@@ -37,7 +38,7 @@ class MIBasicModel(Model):
         return signals[idx:]
 
     def getPredictions(self, start, end):
-        predictions = self.miassembly.get_predictions_with_dataset_id(self.dataset_id, self.training_run_id, start=start, end=end)
+        predictions = self.miassembly.get_predictions_with_dataset_id(self.dataset_id, self.training_run_id, start=start, end=end, debug=self.debug)
         predictions = mlutils.aggregatePredictions([predictions], method="mean_all")
         signals = mlutils.getPredictionSignals(ppl.onehot(predictions.values), self.threshold)
 

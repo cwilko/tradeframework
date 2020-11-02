@@ -28,6 +28,39 @@ class FrameworkTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(dInfo.returns.values[:, 0][1:], mRet.values))
 
+    def test_buyAndHold_singleModel_online(self):
+
+        # Calculate returns via TradeFramework
+        env = SandboxEnvironment("TradeFair")
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
+        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
+
+        for i in range(len(self.asset1.values)):
+            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
+
+        # Calculate returns manually
+        mRet = np.diff(self.asset1.values["Close"]) / self.asset1.values["Close"][:-1]
+
+        self.assertTrue(np.allclose(p.returns.values[:, 0][1:], mRet.values))
+
+    def test_buyAndHold_singleModel_online_partials(self):
+
+        # Calculate returns via TradeFramework
+        env = SandboxEnvironment("TradeFair")
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
+        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
+
+        for i in range(len(self.asset1.values)):
+            slice = self.asset1.values[i:i + 1].copy()
+            slice["Close"] = np.nan
+            env.append(Asset("DOW", slice))
+            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
+
+        # Calculate returns manually
+        mRet = np.diff(self.asset1.values["Close"]) / self.asset1.values["Close"][:-1]
+
+        self.assertTrue(np.allclose(p.returns.values[:, 0][1:], mRet.values))
+
     def test_sellAndHold_singleModel(self):
 
         # Calculate returns via TradeFramework
@@ -64,6 +97,33 @@ class FrameworkTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(p.returns["Open"].values.flatten(), [0., 0., 0.1, 0.2, 0.1, 0.2, 0.1, 0.2, 0.1]))
 
+    # Test that partial input (bar only) allocations match full bar/gap input
+    def test_meanreversion_singleModel_online_partials(self):
+
+        # Calculate returns via TradeFramework
+        env = SandboxEnvironment("TradeFair")
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
+        p.addModel(env.createModel("MeanReversion", "Test-BuyAndHold"))
+
+        env.append(Asset("DOW", self.asset1.values[0:-1]))
+
+        slice = self.asset1.values[-1:].copy()
+        slice["Close"] = np.nan
+        env.append(Asset("DOW", slice))
+
+        res1 = p.getUnderlyingAllocations()["DOW"]["bar"].values.flatten()
+
+        # Calculate returns via TradeFramework
+        env = SandboxEnvironment("TradeFair")
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
+        p.addModel(env.createModel("MeanReversion", "Test-BuyAndHold"))
+
+        env.append(Asset("DOW", self.asset1.values))
+
+        res2 = p.getUnderlyingAllocations()["DOW"]["bar"].values.flatten()
+
+        self.assertTrue(np.allclose(res1, res2))
+
     def test_buyAndSell_singleModel(self):
 
         # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
@@ -87,24 +147,6 @@ class FrameworkTest(unittest.TestCase):
         mRet = randomSignals[:-1] * np.diff(self.asset1.values["Close"]) / self.asset1.values["Close"][:-1]
 
         self.assertTrue(np.allclose(dInfo.returns.values[:, 0][1:], mRet.values))
-
-    def test_buyAndHold_singleModel_online(self):
-
-        # Calculate returns via TradeFramework
-        env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
-
-        for i in range(len(self.asset1.values)):
-            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
-
-        # Calculate returns manually
-        mRet = np.diff(self.asset1.values["Close"]) / self.asset1.values["Close"][:-1]
-
-        print(p.returns.values[:, 1][:-1])
-        print(mRet.values)
-
-        self.assertTrue(np.allclose(p.returns.values[:, 0][1:], mRet.values))
 
     def test_buyAndSell_singleModel_online(self):
 
@@ -296,6 +338,41 @@ class FrameworkTest(unittest.TestCase):
             p.returns["Open"].values.flatten(),
             [0., 0., 0., 0., 0., 4.04651163, 6.16666667, 15.26666667, 16.03333333]))
 
+    def test_kellyWeights_multiModel_online_partials(self):
 
-if __name__ == '__main__':
-    unittest.main()
+        # randomSignals = TODO Pick random numbers between -1 and 1 and round to nearest integer.
+        randomSignals = np.array([-.1, .2, -.3, .4, -.5, .6, -.7, .8, -1])
+
+        class RandomModel(Model):
+
+            def getSignals(self, idx=0):
+                window = self.assets[0].values[idx:]
+                loc = self.assets[0].values.index.get_loc(idx)
+                signals = pd.DataFrame(np.array([randomSignals[loc:loc + len(window)], randomSignals[loc:loc + len(window)]]).T, index=window.index, columns=["bar", "gap"])
+                return signals
+
+        # Calculate returns via TradeFramework for a partial input (bar only)
+        env = SandboxEnvironment("TradeFair")
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellyWeights", opts={"window": 4}))
+        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
+        p.addModel(RandomModel("TestModel2", env))
+
+        env.append(Asset("DOW", self.asset1.values[0:-1]))
+
+        slice = self.asset1.values[-1:].copy()
+        slice["Close"] = np.nan
+        env.append(Asset("DOW", slice))
+
+        res1 = p.getUnderlyingAllocations()["DOW"]["bar"].values.flatten()
+
+        # Calculate returns via TradeFramework for a full input (bar/gap)
+        env = SandboxEnvironment("TradeFair")
+        p2 = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellyWeights", opts={"window": 4}))
+        p2.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
+        p2.addModel(RandomModel("TestModel2", env))
+
+        env.append(Asset("DOW", self.asset1.values))
+
+        res2 = p2.getUnderlyingAllocations()["DOW"]["bar"].values.flatten()
+
+        self.assertTrue(np.allclose(res1, res2))
