@@ -7,12 +7,13 @@ import quantutils.dataset.pipeline as ppl
 
 class MeanReversion(Model):
 
-    def __init__(self, name, env, start=None, end=None):
+    def __init__(self, name, env, start=None, end=None, barOnly=False):
         Model.__init__(self, name, env)
         self.start = start
         self.end = end
         self.env
         self.window = 1
+        self.barOnly = barOnly
         return
 
     # Generate Signals and use them with asset values to calculate allocations
@@ -27,9 +28,12 @@ class MeanReversion(Model):
         signals = pd.DataFrame(np.array([s, s]).T, index=window.index, columns=["bar", "gap"])
 
         if (self.start is not None):
-            scope = ppl.cropTime(window, self.start, self.end)
+            scope = ppl.cropTime(signals, self.start, self.end)
             scopedSignals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
-            scopedSignals.loc[scope.index] = signals[scope.index]
+            scopedSignals.loc[scope.index] = scope.values
             signals = scopedSignals
+
+        if (self.barOnly):
+            signals["gap"] = 0
 
         return signals[idx:]

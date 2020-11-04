@@ -1,30 +1,37 @@
 import pandas as pd
 import numpy as np
 from tradeframework.api import Model
+
 import quantutils.dataset.pipeline as ppl
 
 
-class BuyAndHold(Model):
+class TrendFollowing(Model):
 
     def __init__(self, name, env, start=None, end=None, barOnly=False):
         Model.__init__(self, name, env)
         self.start = start
         self.end = end
+        self.env
+        self.window = 1
         self.barOnly = barOnly
         return
 
     # Generate Signals and use them with asset values to calculate allocations
+    # NOTE: This implement mean reversion per period. E.g if you provide 5-min date, it will mean revert every 5 mins.
     def getSignals(self, idx=0):
 
         # Extract window from the data
         # TODO : Handle list of assetInfos
         window = self.getWindow(idx)
 
+        s = np.insert(np.sign(np.diff(window["Open"])), 0, 0)
+        signals = pd.DataFrame(np.array([s, s]).T, index=window.index, columns=["bar", "gap"])
+
         if (self.start is not None):
-            signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
-            signals.ix[ppl.cropTime(signals, self.start, self.end).index] = 1
-        else:
-            signals = pd.DataFrame(np.ones((len(window), 2)), index=window.index, columns=["bar", "gap"])
+            scope = ppl.cropTime(signals, self.start, self.end)
+            scopedSignals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
+            scopedSignals.loc[scope.index] = scope.values
+            signals = scopedSignals
 
         if (self.barOnly):
             signals["gap"] = 0

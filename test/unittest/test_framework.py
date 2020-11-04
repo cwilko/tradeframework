@@ -7,8 +7,6 @@ from tradeframework.environments import SandboxEnvironment
 
 dir = os.path.dirname(os.path.abspath(__file__))
 
-# TODO : Add Test using a Windowed model
-
 
 class FrameworkTest(unittest.TestCase):
 
@@ -376,3 +374,6 @@ class FrameworkTest(unittest.TestCase):
         res2 = p2.getUnderlyingAllocations()["DOW"]["bar"].values.flatten()
 
         self.assertTrue(np.allclose(res1, res2))
+
+if __name__ == '__main__':
+    unittest.main()
