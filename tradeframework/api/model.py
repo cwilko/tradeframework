@@ -1,4 +1,4 @@
-from . import Derivative, Asset
+from . import Derivative
 
 
 # ======================
@@ -18,6 +18,7 @@ class Model(Derivative):
 
     def append(self, asset):
         # This only works if you have one asset, and only if the Model has Assets as children (rather than Derivatives)
+        # TODO: This should only append the asset if the name matches the existing asset!
         if (len(self.assets) > 0):
             self.assets[0].append(asset)
         else:

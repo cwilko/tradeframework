@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 
 import quantutils.core.statistics as stats
 import matplotlib
@@ -11,13 +12,6 @@ import warnings
 import pyfolio
 from IPython.display import display
 
-# Helper method to merge bar and gap returns into a single period
-
-
-def getPeriodReturns(returns):
-    returns = (returns + 1).prod(axis=1) - 1
-    returns.columns = ["period"]
-    return returns
 
 # Helper method to pretty print derviative performance
 
@@ -46,8 +40,8 @@ def plot(derivative, baseline=None, log=False, includeComponents=False, includeP
     else:
         pnl = lambda x: np.cumprod((getPeriodReturns(x.returns) + 1).resample('B').agg('prod'))
 
-    #quarters = MonthLocator([1, 3, 6, 9])
-    #allmonths = MonthLocator()
+    # quarters = MonthLocator([1, 3, 6, 9])
+    # allmonths = MonthLocator()
     # mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
     # alldays = DayLocator()              # minor ticks on the days
     # weekFormatter = DateFormatter('%b %d')  # e.g., Jan 12
@@ -100,7 +94,7 @@ def displaySummary(derivative, tInfo, baseline=None, log=False, includeComponent
 
 
 def getTradingInfo(derivative, startCapital=1):
-    ua = derivative.getUnderlyingAllocations() * startCapital
+    ua = derivative.getUnderlyingAllocations() * startCapital * derivative.values.values
     returns = pd.DataFrame(derivative.values.values, index=derivative.values.index, columns=[
                            ["Capital", "Capital"], derivative.values.columns])
     results = [returns * startCapital]
@@ -122,3 +116,58 @@ def getTradingInfo(derivative, startCapital=1):
     idx = pd.IndexSlice
     return results[
         (results.loc[:, idx[:, :, ['bar', 'gap']]] != 0).any(axis=1)]
+
+
+def getSignal(x):
+    if x == 0:
+        return "HOLD"
+    if x > 0:
+        return "BUY"
+    else:
+        return "SELL"
+
+
+def getSignals(row, bar=True):
+    markets = row.columns.levels[0].values[1:]
+    capital = row[row.columns.levels[0][0]]["Capital"].values.flatten()  # Get last seen row of capital
+    idx = 0
+    target = "OPEN"
+    if not bar:
+        idx = 1
+        target = "CLOSE"
+
+    currentCapital = capital[idx]
+    print("Time: %s" % row.index[0].isoformat())
+    print("Capital: $%.2f" % currentCapital)
+    print("Target: %s" % target)
+
+    for market in markets:
+        print("====================")
+        print("Market: %s" % market)
+        trade = row[market]["Trade"].values.flatten()[idx]
+        signal = np.sign(trade)
+        print("Signal: %s" % getSignal(signal))
+        print("Amount: $%.2f" % np.abs(trade))
+        print()
+
+    return row
+
+# Get the signal associated with the most recent prices in the tradingInfo structure
+
+
+def getCurrentSignal(portfolio, startCapital=1):
+    tradingInfo = getTradingInfo(portfolio, startCapital)
+    bar = True
+    if not math.isnan(tradingInfo[-1:].values.flatten()[-1]):
+        bar = False
+    return getSignals(tradingInfo[-1:], bar)
+
+
+# Given a predicted Asset value (or a list of possible predict Asset values), what would be the generated signal
+
+def predictSignal(env, assets, startCapital=1):
+    if not isinstance(assets, list):
+        assets = [assets]
+
+    for asset in assets:
+        getCurrentSignal(env.append(asset, copy=True), startCapital)

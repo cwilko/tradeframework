@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from tradeframework.api import Asset
 from tradeframework.environments import SandboxEnvironment
-import tradeframework.utils.trader as trader
+import tradeframework.operations.utils as utils
 from quantutils.api.auth import CredentialsStore
 
 dir = os.path.dirname(os.path.abspath(__file__))
@@ -31,7 +31,7 @@ class FrameworkTest(unittest.TestCase):
         env.append(Asset("DOW", self.asset1.values))
 
         # Check results
-        self.assertTrue(np.allclose(np.prod(trader.getPeriodReturns(p.returns) + 1), 0.9941924543457394))
+        self.assertTrue(np.allclose(np.prod(utils.getPeriodReturns(p.returns) + 1), 0.9941924543457394))
 
     def test_MIBasic_singleModel_online(self):
 
@@ -56,7 +56,7 @@ class FrameworkTest(unittest.TestCase):
         env.append(Asset("DOW", self.asset1.values[c:]))
 
         # Check results
-        self.assertTrue(np.allclose(np.prod(trader.getPeriodReturns(p.returns) + 1), 0.9941924543457394))
+        self.assertTrue(np.allclose(np.prod(utils.getPeriodReturns(p.returns) + 1), 0.9941924543457394))
 
     def test_MIBasic_multiModel(self):
 
@@ -76,9 +76,9 @@ class FrameworkTest(unittest.TestCase):
 
         env.append(Asset("DOW", self.asset1.values))
 
-        print(np.prod(trader.getPeriodReturns(p.returns) + 1))
+        print(np.prod(utils.getPeriodReturns(p.returns) + 1))
         # Check results
-        self.assertTrue(np.allclose(np.prod(trader.getPeriodReturns(p.returns) + 1), 0.9979433892004727))
+        self.assertTrue(np.allclose(np.prod(utils.getPeriodReturns(p.returns) + 1), 0.9979433892004727))
 
     def test_MIBasic_multiModel_online(self):
 
@@ -108,10 +108,10 @@ class FrameworkTest(unittest.TestCase):
             c = i + 1
         env.append(Asset("DOW", self.asset1.values[c:]))
 
-        print(np.prod(trader.getPeriodReturns(p.returns) + 1))
+        print(np.prod(utils.getPeriodReturns(p.returns) + 1))
 
         # Check results
-        self.assertTrue(np.allclose(np.prod(trader.getPeriodReturns(p.returns) + 1), 0.9979433892004727))
+        self.assertTrue(np.allclose(np.prod(utils.getPeriodReturns(p.returns) + 1), 0.9979433892004727))
 
 if __name__ == '__main__':
     unittest.main()
