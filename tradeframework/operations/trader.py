@@ -93,8 +93,10 @@ def displaySummary(derivative, tInfo, baseline=None, log=False, includeComponent
 # Helper method to turn derivative signals into trading information (buy/sell amounts, capital, etc)
 
 
-def getTradingInfo(derivative, startCapital=1):
-    ua = derivative.getUnderlyingAllocations() * startCapital * derivative.values.values
+def getTradingInfo(derivative, startCapital=1, unitAllocations=True, summary=True):
+    ua = derivative.getUnderlyingAllocations()  # * startCapital * derivative.values.values
+    if not unitAllocations:
+        ua = ua * startCapital * derivative.values.values
     returns = pd.DataFrame(derivative.values.values, index=derivative.values.index, columns=[
                            ["Capital", "Capital"], derivative.values.columns])
     results = [returns * startCapital]
@@ -106,16 +108,20 @@ def getTradingInfo(derivative, startCapital=1):
         b[0] = 0
         trade = pd.DataFrame(
             (a - b).reshape(len(derivative.values), 2), index=ua[l1].index, columns=ua[l1].columns)
-        results.append(pd.concat([ua[l1], trade], keys=[
-                       "Allocation", "Trade"], axis=1))
+        prices = pd.DataFrame(
+            derivative.env.getAssetStore().getAsset("DOW").values[["Open", "Close"]].values, index=ua[l1].index, columns=["Open", "Close"])
+        results.append(pd.concat([prices, ua[l1], trade], keys=[
+                       "Price", "Allocation", "Trade"], axis=1))
 
     mkts.insert(0, derivative.name)
     results = pd.concat(results, keys=mkts, axis=1)
 
-    # Filter out non-trading periods
-    idx = pd.IndexSlice
-    return results[
-        (results.loc[:, idx[:, :, ['bar', 'gap']]] != 0).any(axis=1)]
+    # Filter out non-trading periods if summary needed
+    if (summary):
+        idx = pd.IndexSlice
+        results = results[(results.loc[:, idx[:, :, ['bar', 'gap']]] != 0).any(axis=1)]
+
+    return results
 
 
 def getSignal(x):
@@ -126,48 +132,45 @@ def getSignal(x):
     else:
         return "SELL"
 
+# Get the signal associated with the most recent prices in the tradingInfo structure
 
-def getSignals(row, bar=True):
-    markets = row.columns.levels[0].values[1:]
-    capital = row[row.columns.levels[0][0]]["Capital"].values.flatten()  # Get last seen row of capital
+
+def getCurrentSignal(portfolio, capital=1):
+    tradingInfo = getTradingInfo(portfolio, summary=False)
     idx = 0
     target = "OPEN"
-    if not bar:
+    if not math.isnan(tradingInfo[-1:].values.flatten()[-1]):
         idx = 1
         target = "CLOSE"
 
-    currentCapital = capital[idx]
+    row = tradingInfo[-1:]  # Get last seen row of table
+    markets = row.columns.levels[0].values[1:]
+    value = row[row.columns.levels[0][0]]["Capital"].values.flatten()  # Get last seen value of capital
+
+    currentValue = value[idx]
     print("Time: %s" % row.index[0].isoformat())
-    print("Capital: $%.2f" % currentCapital)
+    print("Portfolio Value: $%.4f" % currentValue)
+    print("Capital: $%.2f" % capital)
     print("Target: %s" % target)
 
     for market in markets:
         print("====================")
         print("Market: %s" % market)
+        price = row[market]["Price"].values.flatten()[idx]
         trade = row[market]["Trade"].values.flatten()[idx]
         signal = np.sign(trade)
+        print("Price: $%.2f" % price)
         print("Signal: %s" % getSignal(signal))
-        print("Amount: $%.2f" % np.abs(trade))
+        print("Amount: $%.2f" % np.abs(trade * capital))
         print()
 
     return row
 
-# Get the signal associated with the most recent prices in the tradingInfo structure
 
+# Given a next price value (or a list of possible prices), what would be the generated signal
+def predictSignal(env, prices, capital=1):
+    if not isinstance(prices, list):
+        prices = [prices]
 
-def getCurrentSignal(portfolio, startCapital=1):
-    tradingInfo = getTradingInfo(portfolio, startCapital)
-    bar = True
-    if not math.isnan(tradingInfo[-1:].values.flatten()[-1]):
-        bar = False
-    return getSignals(tradingInfo[-1:], bar)
-
-
-# Given a predicted Asset value (or a list of possible predict Asset values), what would be the generated signal
-
-def predictSignal(env, assets, startCapital=1):
-    if not isinstance(assets, list):
-        assets = [assets]
-
-    for asset in assets:
-        getCurrentSignal(env.append(asset, copy=True), startCapital)
+    for price in prices:
+        getCurrentSignal(env.append(price, copy=True), capital)

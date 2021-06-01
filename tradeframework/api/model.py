@@ -15,14 +15,13 @@ class Model(Derivative):
     def __init__(self, name, env):
         Derivative.__init__(self, name, env)
         self.window = 0  # Default - No window
+        self.assetMap = {}
 
+    # TODO: This only works if you have one asset, and only if the Model has Assets as children (rather than Derivatives)
     def append(self, asset):
-        # This only works if you have one asset, and only if the Model has Assets as children (rather than Derivatives)
-        # TODO: This should only append the asset if the name matches the existing asset!
-        if (len(self.assets) > 0):
-            self.assets[0].append(asset)
-        else:
-            self.assets = [asset]
+        storedAsset = self.env.getAssetStore().append(asset)
+        self.assetMap[asset.getName()] = storedAsset
+        self.assets = list(self.assetMap.values())
 
         return super().append([self.getSignals(asset.values.index[0])], idx=asset.values.index[0])
 

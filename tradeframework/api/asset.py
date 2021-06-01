@@ -8,7 +8,6 @@ import pandas as pd
 
 class Asset:
 
-    # TODO: Centralised storage of underlying assets in an Asset Store on the env?
     def __init__(self, name, values=None):
         self.name = name
         self.values = values
@@ -19,11 +18,11 @@ class Asset:
     def getValues(self):
         return self.values
 
+    # TODO : Could implement pip here
     def getUnderlyingAllocations(self):
         return pd.DataFrame(np.ones((len(self.values), 2)), columns=[
             [self.name, self.name], ['bar', 'gap']], index=self.values.index)
 
-    # TODO: Centralised storage of underlying assets in an Asset Store on the env?
     def append(self, asset):
         if self.values is None:
             self.values = asset.values

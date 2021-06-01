@@ -1,4 +1,5 @@
 from tradeframework.api.asset import Asset
+from tradeframework.api.assetStore import AssetStore
 from tradeframework.api.derivative import Derivative
 from tradeframework.api.portfolio import Portfolio
 from tradeframework.api.optimizer import Optimizer

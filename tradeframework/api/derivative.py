@@ -19,6 +19,7 @@ class Derivative(Asset):
         else:
             self.assets = assets
 
+    # TODO : Rename this... Conflicts with child class method name
     def append(self, weights, idx=0):
 
         values, uAllocations, weights, returns = self.env.tradeEngine.updateDerivative(self, self.assets, weights, idx)

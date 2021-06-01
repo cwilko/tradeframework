@@ -2,7 +2,7 @@
 # TradeEnvironment Class
 # ======================
 
-from . import Portfolio
+from . import Portfolio, AssetStore
 import tradeframework.optimizers as opt
 import tradeframework.models as md
 
@@ -12,6 +12,7 @@ class TradeEnvironment():
     def __init__(self, name):
         self.name = name
         self.portfolio = Portfolio(name + "_Portfolio", self)
+        self.assetStore = AssetStore()
         return
 
     def createPortfolio(self, name, optimizer=None):
@@ -26,6 +27,9 @@ class TradeEnvironment():
         optInstance = getattr(opt, optClass)
         optimizer = optInstance(optName, self, **opts)
         return optimizer
+
+    def getAssetStore(self):
+        return self.assetStore
 
     def append(self, asset):
         pass
