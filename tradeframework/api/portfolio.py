@@ -20,6 +20,11 @@ class Portfolio(Derivative):
         self.assets.append(portfolio)
         return portfolio
 
+    def removePortfolio(self, name):
+        p = next((x for x in self.assets if x.name == name), None)
+        self.assets.remove(p)
+        return p
+
     def addModel(self, model):
         self.assets.append(model)
         return model

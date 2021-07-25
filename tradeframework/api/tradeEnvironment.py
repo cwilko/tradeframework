@@ -28,6 +28,9 @@ class TradeEnvironment():
         optimizer = optInstance(optName, self, **opts)
         return optimizer
 
+    def removePortfolio(self, name, optimizer=None):
+        return self.portfolio.removePortfolio(name)
+
     def getAssetStore(self):
         return self.assetStore
 

@@ -1,4 +1,4 @@
-git+git://github.com/cwilko/quantutils.git#egg=quantutils
+quantutils @ git+ssh://git@github.com/cwilko/quantutils#egg=quantutils
 numpy>=1.14.3
 pandas>=0.23.4
 
