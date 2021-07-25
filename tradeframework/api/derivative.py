@@ -19,6 +19,7 @@ class Derivative(Asset):
         else:
             self.assets = assets
 
+    # TODO : Rename this... Conflicts with child class method name
     def append(self, weights, idx=0):
 
         values, uAllocations, weights, returns = self.env.tradeEngine.updateDerivative(self, self.assets, weights, idx)
@@ -58,8 +59,6 @@ class Derivative(Asset):
         if (self.uAllocations is not None):
             assetCount = len(self.uAllocations.columns.levels[0])
             for l1 in range(assetCount):
-                print(self)
-                print(self.assets)
                 uAllocations = self.assets[l1].getUnderlyingAllocations()
                 for l2 in uAllocations.columns.levels[0]:
                     assetUAllocation = uAllocations[l2] * \

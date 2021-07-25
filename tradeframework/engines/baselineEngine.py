@@ -1,7 +1,7 @@
 # ======================
 # SpreadsEngine Class
 # ======================
-from tradeframework.api import TradeEngine, Derivative
+from tradeframework.api import TradeEngine
 import pandas as pd
 import numpy as np
 

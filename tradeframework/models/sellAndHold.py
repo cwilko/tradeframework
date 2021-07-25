@@ -17,7 +17,7 @@ class SellAndHold(Model):
 
         # Extract window from the data
         # TODO : Handle list of assetInfos
-        window = self.assets[0].values[idx:]
+        window = self.getWindow(idx)
 
         if (self.start is not None):
             signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
@@ -26,4 +26,4 @@ class SellAndHold(Model):
         else:
             signals = pd.DataFrame(np.negative(np.ones((len(window), 2))), index=window.index, columns=["bar", "gap"])
 
-        return signals
+        return signals[idx:]

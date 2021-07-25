@@ -1,5 +1,5 @@
 from tradeframework.api import Optimizer
-import tradeframework.utils.trader as tradeUtils
+import tradeframework.operations.utils as utils
 
 import numpy as np
 import pandas as pd
@@ -20,8 +20,8 @@ class KellyOptimizer(Optimizer):
     def getWeights(self, returns, idx=0):
 
         # Converge bar and gap into single periods
-        pReturns = np.array([tradeUtils.getPeriodReturns(ret).values.flatten() for ret in returns])
-        deltaReturns = np.array([tradeUtils.getPeriodReturns(ret[idx:]).values.flatten() for ret in returns])
+        pReturns = np.array([utils.getPeriodReturns(ret).values.flatten() for ret in returns])
+        deltaReturns = np.array([utils.getPeriodReturns(ret[idx:]).values.flatten() for ret in returns])
         window_start = len(pReturns[0]) - len(deltaReturns[0])
 
         if (self.window is None):

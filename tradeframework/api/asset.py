@@ -18,6 +18,7 @@ class Asset:
     def getValues(self):
         return self.values
 
+    # TODO : Could implement pip here
     def getUnderlyingAllocations(self):
         return pd.DataFrame(np.ones((len(self.values), 2)), columns=[
             [self.name, self.name], ['bar', 'gap']], index=self.values.index)
