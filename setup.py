@@ -33,6 +33,10 @@ setup(
 
     install_requires=requirements,
 
+    extras_require={
+        'plot': ['matplotlib>=2.2.2', 'pyfolio>=0.9.0'],
+    },
+
     # dependency_links=['-e git+https://github.com/cwilko/quantutils#egg=quantutils'],
 
     # You can just specify package directories manually here if your project is
