@@ -20,10 +20,7 @@ class Derivative(Asset):
             self.assets = assets
 
     def __str__(self):
-        derivStr = ''.join(['{ "name": "', self.name, '", "type": "', str(type(self)), '", "assets": [ '])
-        for asset in self.assets:
-            derivStr = ''.join([derivStr, str(asset)])
-        return ''.join([derivStr, ' ] }'])
+        return ''.join(['{ "id": "', self.uuid, '", "name": "', self.name, '", "type": "', str(type(self)), '", "assets": [', ','.join([str(asset) for asset in self.assets]), '] }'])
 
     # TODO : Rename this... Conflicts with child class method name
     def append(self, weights, idx=0):

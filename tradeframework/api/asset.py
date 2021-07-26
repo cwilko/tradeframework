@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import uuid
 
 # ======================
 # Asset Class
@@ -9,14 +10,18 @@ import pandas as pd
 class Asset:
 
     def __init__(self, name, values=None):
+        self.uuid = str(uuid.uuid4())
         self.name = name
         self.values = values
 
     def __str__(self):
-        return ''.join(['{ "name": "', self.name, '", "type": "', str(type(self)), '" }'])
+        return ''.join(['{ "id": "', self.uuid, '", "name": "', self.name, '", "type": "', str(type(self)), '"}'])
 
     def getName(self):
         return self.name
+
+    def getId(self):
+        return self.uuid
 
     def getValues(self):
         return self.values
