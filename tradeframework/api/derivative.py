@@ -19,6 +19,12 @@ class Derivative(Asset):
         else:
             self.assets = assets
 
+    def __str__(self):
+        derivStr = ''.join(['{ "name": "', self.name, '", "type": "', str(type(self)), '", "assets": [ '])
+        for asset in self.assets:
+            derivStr = ''.join([derivStr, str(asset)])
+        return ''.join([derivStr, ' ] }'])
+
     # TODO : Rename this... Conflicts with child class method name
     def append(self, weights, idx=0):
 

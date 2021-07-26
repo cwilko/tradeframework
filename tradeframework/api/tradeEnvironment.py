@@ -15,6 +15,9 @@ class TradeEnvironment():
         self.assetStore = AssetStore()
         return
 
+    def __str__(self):
+        return ''.join(['{ "name": "', self.name, '", "type": "', str(type(self)), '", "portfolio": ', str(self.portfolio), ' }'])
+
     def createPortfolio(self, name, optimizer=None):
         return self.portfolio.addPortfolio(name, optimizer)
 

@@ -12,6 +12,9 @@ class Asset:
         self.name = name
         self.values = values
 
+    def __str__(self):
+        return ''.join(['{ "name": "', self.name, '", "type": "', str(type(self)), '" }'])
+
     def getName(self):
         return self.name
 
