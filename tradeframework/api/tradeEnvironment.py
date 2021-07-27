@@ -41,9 +41,9 @@ class TradeEnvironment():
     def createPortfolio(self, name, optimizer=None):
         return Portfolio(name, self, optimizer)
 
-    def createModel(self, name, modelClass, args=()):
+    def createModel(self, name, modelClass, opts={}):
         modelInstance = getattr(md, modelClass)
-        model = modelInstance(name, self, *args)
+        model = modelInstance(name, self, **opts)
         return model
 
     def createOptimizer(self, name, optClass, opts={}):
