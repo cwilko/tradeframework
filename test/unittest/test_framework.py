@@ -17,8 +17,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
         dInfo = env.append(self.asset1)
 
         # Calculate returns manually
@@ -30,8 +31,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
 
         for i in range(len(self.asset1.values)):
             env.append(Asset("DOW", self.asset1.values[i:i + 1]))
@@ -45,8 +47,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
 
         for i in range(len(self.asset1.values)):
             slice = self.asset1.values[i:i + 1].copy()
@@ -63,8 +66,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("SellAndHold", "Test-SellAndHold"))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-SellAndHold", "SellAndHold"))
         dInfo = env.append(self.asset1)
 
         # Calculate returns manually
@@ -77,8 +81,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("MeanReversion", "Test-MeanReversion"))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-MeanReversion", "MeanReversion"))
         dInfo = env.append(self.asset1)
 
         self.assertTrue(np.allclose(dInfo.returns["Open"].values.flatten(), [0., 0., 0.1, 0.2, 0.1, 0.2, 0.1, 0.2, 0.1]))
@@ -88,8 +93,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("MeanReversion", "Test-MeanReversion"))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-MeanReversion", "MeanReversion"))
         for i in range(len(self.asset1.values)):
             env.append(Asset("DOW", self.asset1.values[i:i + 1]))
 
@@ -100,8 +106,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("MeanReversion", "Test-BuyAndHold"))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-MeanReversion", "MeanReversion"))
 
         env.append(Asset("DOW", self.asset1.values[0:-1]))
 
@@ -113,8 +120,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("MeanReversion", "Test-BuyAndHold"))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-MeanReversion", "MeanReversion"))
 
         env.append(Asset("DOW", self.asset1.values))
 
@@ -137,8 +145,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(RandomModel("RandomModel", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(RandomModel("RandomModel", env))
         dInfo = env.append(self.asset1)
 
         # Calculate returns manually
@@ -161,8 +170,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(RandomModel("RandomModel", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(RandomModel("RandomModel", env))
 
         for i in range(len(self.asset1.values)):
             env.append(Asset("DOW", self.asset1.values[i:i + 1]))
@@ -185,9 +195,10 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
-        p.addModel(RandomModel("TestModel2", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
+        p.addAsset(RandomModel("TestModel2", env))
         dInfo = env.append(self.asset1)
 
         # Test returns were calculated correctly
@@ -213,9 +224,10 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
-        p.addModel(RandomModel("TestModel2", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
+        p.addAsset(RandomModel("TestModel2", env))
 
         for i in range(len(self.asset1.values)):
             env.append(Asset("DOW", self.asset1.values[i:i + 1]))
@@ -243,8 +255,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellylWeights"))
-        p.addModel(RandomModel("TestModel", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(RandomModel("TestModel", env))
         env.append(self.asset1)
 
         self.assertTrue(np.allclose(
@@ -270,8 +283,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellylWeights"))
-        p.addModel(RandomModel("TestModel", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(RandomModel("TestModel", env))
 
         for i in range(len(self.asset1.values)):
             env.append(Asset("DOW", self.asset1.values[i:i + 1]))
@@ -301,9 +315,10 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellylWeights", opts={"window": 4}))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
-        p.addModel(RandomModel("TestModel2", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer", opts={"window": 4}))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
+        p.addAsset(RandomModel("TestModel2", env))
         env.append(self.asset1)
 
         self.assertTrue(np.allclose(
@@ -325,9 +340,10 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellyWeights", opts={"window": 4}))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
-        p.addModel(RandomModel("TestModel2", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer", opts={"window": 4}))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
+        p.addAsset(RandomModel("TestModel2", env))
 
         for i in range(len(self.asset1.values)):
             env.append(Asset("DOW", self.asset1.values[i:i + 1]))
@@ -351,9 +367,10 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework for a partial input (bar only)
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellyWeights", opts={"window": 4}))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
-        p.addModel(RandomModel("TestModel2", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer", opts={"window": 4}))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
+        p.addAsset(RandomModel("TestModel2", env))
 
         env.append(Asset("DOW", self.asset1.values[0:-1]))
 
@@ -365,9 +382,10 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework for a full input (bar/gap)
         env = SandboxEnvironment("TradeFair")
-        p2 = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellyWeights", opts={"window": 4}))
-        p2.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
-        p2.addModel(RandomModel("TestModel2", env))
+        p2 = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer", opts={"window": 4}))
+        env.setPortfolio(p2)
+        p2.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
+        p2.addAsset(RandomModel("TestModel2", env))
 
         env.append(Asset("DOW", self.asset1.values))
 

@@ -14,7 +14,7 @@ class FrameworkTest(unittest.TestCase):
 
     def setUp(self):
         ts = pd.read_csv(dir + '/data/testDOW.csv', parse_dates=True, index_col=0, dayfirst=True)
-        ts = ts.tz_localize("UCT")
+        #ts = ts.tz_localize("UTC")
         ts.index = ts.index.tz_convert("US/Eastern")
         self.asset1 = Asset("DOW", ts)
 
@@ -25,8 +25,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("MIBasicModel", "Test-MIBasicModel", args=(CredentialsStore(), DATASET_ID, TRAINING_RUN_ID, 0)))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-MIBasicModel", "MIBasicModel", opts={'credstore': CredentialsStore(), 'dataset_id': DATASET_ID, 'training_run_id': TRAINING_RUN_ID, 'threshold': 0}))
 
         env.append(Asset("DOW", self.asset1.values))
 
@@ -40,8 +41,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("MIBasicModel", "Test-MIBasicModel", args=(CredentialsStore(), DATASET_ID, TRAINING_RUN_ID, 0)))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-MIBasicModel", "MIBasicModel", opts={'credstore': CredentialsStore(), 'dataset_id': DATASET_ID, 'training_run_id': TRAINING_RUN_ID, 'threshold': 0}))
 
         # Extract 3pm indices
         # crop = ppl.cropTime(asset1.values, "15:00", "16:00")
@@ -71,8 +73,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("MIAggregateModel", "Test-MIAggregateModel", args=(CredentialsStore(), agg, "vote_unanimous_all", 0)))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-MIAggregateModel", "MIAggregateModel", opts={'credstore': CredentialsStore(), 'mi_models': agg, 'aggMethod': 'vote_unanimous_all', 'threshold': 0}))
 
         env.append(Asset("DOW", self.asset1.values))
 
@@ -93,8 +96,9 @@ class FrameworkTest(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeightsOptimizer", "EqualWeights"))
-        p.addModel(env.createModel("MIAggregateModel", "Test-MIAggregateModel", args=(CredentialsStore(), agg, "vote_unanimous_all", 0)))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-MIAggregateModel", "MIAggregateModel", opts={'credstore': CredentialsStore(), 'mi_models': agg, 'aggMethod': 'vote_unanimous_all', 'threshold': 0}))
 
         # Extract 3pm indices
         # crop = ppl.cropTime(asset1.values, "15:00", "16:00")

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import uuid
+import copy as cp
 
 # ======================
 # Asset Class
@@ -37,3 +38,9 @@ class Asset:
         else:
             self.values = asset.values.combine_first(self.values)
         return self
+
+    def copy(self):
+        asset = cp.deepcopy(self)
+        asset.uuid = str(uuid.uuid4())
+        asset.name = asset.name + "_copy"
+        return asset

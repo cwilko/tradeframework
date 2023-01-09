@@ -50,9 +50,10 @@ class FrameworkTestPerf(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellylWeights", opts={"window": 4}))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
-        p.addModel(RandomModel("TestModel2", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer", opts={"window": 4}))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
+        p.addAsset(RandomModel("TestModel2", env))
 
         start = time.time()
         env.append(self.asset1)
@@ -78,9 +79,10 @@ class FrameworkTestPerf(unittest.TestCase):
 
         # Calculate returns via TradeFramework
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyOptimizer", "KellyWeights", opts={"window": 4}))
-        p.addModel(env.createModel("BuyAndHold", "Test-BuyAndHold"))
-        p.addModel(RandomModel("TestModel2", env))
+        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer", opts={"window": 4}))
+        env.setPortfolio(p)
+        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
+        p.addAsset(RandomModel("TestModel2", env))
 
         start = time.time()
         for i in range(len(self.asset1.values)):

@@ -10,10 +10,11 @@ import uuid
 
 class TradeEnvironment():
 
-    def __init__(self, name):
+    def __init__(self, name, tz):
         self.uuid = str(uuid.uuid4())
         self.name = name
         self.assetStore = AssetStore()
+        self.tz = tz
         return
 
     def __str__(self):
@@ -27,6 +28,9 @@ class TradeEnvironment():
 
     def getAssetStore(self):
         return self.assetStore
+
+    def getTimezone(self):
+        return self.tz
 
     def getPortfolio(self):
         if not self.portfolio:
@@ -51,6 +55,13 @@ class TradeEnvironment():
         optimizer = optInstance(name, self, **opts)
         return optimizer
 
-    def append(self, asset):
+    # Append an asset con
+    def append(self, asset, copy=False):
         if not self.portfolio:
             raise Exception('Error: No portfolio has been configured for this environment.')
+
+        # Mediate between our Portfolio and the Environment
+        portfolio = self.portfolio
+        if copy:
+            portfolio = portfolio.copy()
+        return portfolio.append(asset)
