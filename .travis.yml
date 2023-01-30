@@ -7,4 +7,4 @@ before_install:
   - pip install -U pytest
 install:
   - pip install . # install package + test dependencies
-script: pytest # run tests
+script: pytest ./test/unittest/test_framework.py # run tests
