@@ -8,7 +8,7 @@ import pandas as pd
 
 class Derivative(Asset):
 
-    def __init__(self, name, env, values=None, uAllocations=None, weights=None, returns=None, assets=None):
+    def __init__(self, name, env, values=None, uAllocations=None, weights=None, returns=None, assets=None, weightedAssets=None):
         Asset.__init__(self, name, values)
         self.env = env
         self.uAllocations = uAllocations
@@ -16,16 +16,17 @@ class Derivative(Asset):
         self.returns = returns
         if (assets is None):
             self.assets = []
+            self.weightedAssets = []
         else:
             self.assets = assets
+            self.weightedAssets = weightedAssets
 
     def __str__(self):
         return ''.join(['{ "id": "', self.uuid, '", "name": "', self.name, '", "type": "', str(type(self)), '", "assets": [', ','.join([str(asset) for asset in self.assets]), '] }'])
 
-    # TODO : Rename this... Conflicts with child class method name
-    def append(self, weights, idx=0):
+    def updateState(self, weights, idx=0):
 
-        values, uAllocations, weights, returns = self.env.tradeEngine.updateDerivative(self, self.assets, weights, idx)
+        values, uAllocations, weights, returns = self.env.tradeEngine.updateDerivative(self, self.weightedAssets, weights, idx)
 
         if self.values is None:
             self.values = values
@@ -56,6 +57,10 @@ class Derivative(Asset):
             else:
                 asset = None
         return asset
+
+    def findAsset(self, assetName):
+        print("in asset")
+        return None
 
     def getUnderlyingAllocations(self):
         myUAllocations = None

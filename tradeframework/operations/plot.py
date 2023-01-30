@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 import quantutils.core.statistics as stats
+from quantutils.core.plot import OHLCChart
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.dates import AutoDateLocator, AutoDateFormatter
@@ -11,10 +12,33 @@ import warnings
 import pyfolio
 from IPython.display import display
 
+# Plot Candlestick chart for an asset
+
+
+def plotAsset(asset, options=None):
+    chart = OHLCChart(options)
+    chart.addSeries(asset.getName(), asset.values.reset_index().values.tolist())
+    display(chart.getChart())
+    return chart
+
+
+def plotUnderlying(derivative, underlyingName, options=None):
+    return plotAsset(derivative.env.getAssetStore().getAsset(underlyingName))
+
+
+def plotWeightedUnderlying(derivative, underlyingName, options=None):
+    underlying = derivative.env.getAssetStore().getAsset(underlyingName)
+    asset = underlying.values.mul(derivative.weights[underlyingName]["bar"].values, axis=0)
+    asset.replace(0, np.nan, inplace=True)
+    chart = OHLCChart(options)
+    chart.addSeries(underlyingName, asset.reset_index().values.tolist())
+    display(chart.getChart())
+    return chart
+
 # Helper method to pretty print derviative performance
 
 
-def plot(derivative, baseline=None, log=False, includeComponents=False, includePrimary=True, custom=[]):
+def plotReturns(derivative, baseline=None, log=False, includeComponents=False, includePrimary=True, custom=[]):
 
     assets = []
 
@@ -34,9 +58,9 @@ def plot(derivative, baseline=None, log=False, includeComponents=False, includeP
         assets.append(userdata)
 
     if (log):
-        pnl = lambda x: np.cumsum(np.log((utils.getPeriodReturns(x.returns) + 1).resample('B').agg('prod')))
+        pnl = lambda x: np.cumsum(np.log((utils.getPeriodReturns(x.returns[np.prod(derivative.values, axis=1) != 1]) + 1).resample('B').agg('prod')))
     else:
-        pnl = lambda x: np.cumprod((utils.getPeriodReturns(x.returns) + 1).resample('B').agg('prod'))
+        pnl = lambda x: np.cumprod((utils.getPeriodReturns(x.returns[np.prod(derivative.values, axis=1) != 1]) + 1).resample('B').agg('prod'))
 
     # quarters = MonthLocator([1, 3, 6, 9])
     # allmonths = MonthLocator()
@@ -55,7 +79,6 @@ def plot(derivative, baseline=None, log=False, includeComponents=False, includeP
     ax.xaxis.set_major_formatter(auto_formatter)
 
     for asset in assets:
-        print(asset)
         ax.plot(pnl(asset), label=asset.name)
 
     ax.xaxis_date()

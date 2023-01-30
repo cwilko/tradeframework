@@ -22,13 +22,17 @@ class Model(Derivative):
         storedAsset = self.env.getAssetStore().append(asset)
         self.assetMap[asset.getName()] = storedAsset
         self.assets = list(self.assetMap.values())
+        self.weightedAssets = list(self.assetMap.values())
 
-        return super().append([self.getSignals(asset.values.index[0])], idx=asset.values.index[0])
+        signals = [self.getSignals(asset.values.index[0]) for asset in self.assets]
+
+        return super().updateState(signals, idx=asset.values.index[0])
 
     # Method for calculating the signals associated with input asset values
     def getSignals(self, asset):
         pass
 
+    # TODO: Support multiple assets, e.g. getWindow(self, assetName, idx)
     def getWindow(self, idx):
 
         if (self.window is -1):  # Use all available data

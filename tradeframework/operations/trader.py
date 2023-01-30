@@ -6,11 +6,11 @@ import math
 
 
 def getTradingInfo(derivative, startCapital=1, unitAllocations=True, summary=True):
+    ocData = derivative.values[["Open", "Close"]]
     ua = derivative.getUnderlyingAllocations()  # * startCapital * derivative.values.values
     if not unitAllocations:
-        ua = ua * startCapital * derivative.values.values
-    returns = pd.DataFrame(derivative.values.values, index=derivative.values.index, columns=[
-                           ["Capital", "Capital"], derivative.values.columns])
+        ua = ua * startCapital * ocData.values
+    returns = pd.DataFrame(ocData.values, index=ocData.index, columns=[["Capital", "Capital"], ocData.columns])
     results = [returns * startCapital]
     mkts = list(set(ua.columns.get_level_values(0)))
 
@@ -19,7 +19,7 @@ def getTradingInfo(derivative, startCapital=1, unitAllocations=True, summary=Tru
         b = np.roll(a, 1)
         b[0] = 0
         trade = pd.DataFrame(
-            (a - b).reshape(len(derivative.values), 2), index=ua[l1].index, columns=ua[l1].columns)
+            (a - b).reshape(len(ocData), 2), index=ua[l1].index, columns=ua[l1].columns)
         prices = pd.DataFrame(
             derivative.env.getAssetStore().getAsset("DOW").values[["Open", "Close"]].values, index=ua[l1].index, columns=["Open", "Close"])
         results.append(pd.concat([prices, ua[l1], trade], keys=[
@@ -58,7 +58,6 @@ def getCurrentSignal(portfolio, capital=1):
     row = tradingInfo[-1:]  # Get last seen row of table
     markets = row.columns.levels[0].values[1:]
     value = row[row.columns.levels[0][0]]["Capital"].values.flatten()  # Get last seen value of capital
-
     currentValue = value[idx]
 
     currentSignal = {

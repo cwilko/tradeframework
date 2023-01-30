@@ -6,10 +6,11 @@ import quantutils.dataset.pipeline as ppl
 
 class SellAndHold(Model):
 
-    def __init__(self, name, env, start=None, end=None):
+    def __init__(self, name, env, start=None, end=None, barOnly=False):
         Model.__init__(self, name, env)
         self.start = start
         self.end = end
+        self.barOnly = barOnly
         return
 
     # Generate Signals and use them with asset values to calculate allocations
@@ -21,9 +22,11 @@ class SellAndHold(Model):
 
         if (self.start is not None):
             signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
-            signals.ix[ppl.cropTime(signals, self.start, self.end).index] = -1
-            signals["gap"] = 0
+            signals.loc[ppl.cropTime(signals, self.start, self.end).index] = -1
         else:
             signals = pd.DataFrame(np.negative(np.ones((len(window), 2))), index=window.index, columns=["bar", "gap"])
+
+        if (self.barOnly):
+            signals["gap"] = 0
 
         return signals[idx:]
