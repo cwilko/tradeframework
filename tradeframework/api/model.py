@@ -24,9 +24,7 @@ class Model(Derivative):
         self.assets = list(self.assetMap.values())
         self.weightedAssets = list(self.assetMap.values())
 
-        signals = [self.getSignals(asset.values.index[0]) for asset in self.assets]
-
-        return super().updateState(signals, idx=asset.values.index[0])
+        return super().updateState([self.getSignals(asset.values.index[0])], idx=asset.values.index[0])
 
     # Method for calculating the signals associated with input asset values
     def getSignals(self, asset):
