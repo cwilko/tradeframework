@@ -9,15 +9,13 @@ from tradeframework.api import Model
 
 class MovingAverage(Model):
 
-    def __init__(self, name, env, ma1_win):
-        Model.__init__(self, name, env)
+    def __init__(self, env, ma1_win):
+        Model.__init__(self, env)
         self.window = ma1_win
         self.ma1_win = ma1_win
         return
 
-    def getSignals(self, idx=0):
-
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         ma = tsUtils.MA(window["Open"].values, self.ma1_win, self.ma1_win / 2)
 

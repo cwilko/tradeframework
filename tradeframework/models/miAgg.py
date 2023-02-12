@@ -11,8 +11,8 @@ from quantutils.api.assembly import MIAssembly
 
 class MIAggregateModel(Model):
 
-    def __init__(self, name, env, credstore, mi_models, aggMethod, threshold=0, barOnly=False, debug=False):
-        Model.__init__(self, name, env)
+    def __init__(self, env, credstore, mi_models, aggMethod, threshold=0, barOnly=False, debug=False):
+        Model.__init__(self, env)
 
         self.miassembly = MIAssembly(MarketInsights(credstore), Functions(credstore))
         self.modelConfig = mi_models
@@ -23,11 +23,7 @@ class MIAggregateModel(Model):
         return
 
     # Generate Signals and use them with asset values to calculate allocations
-    def getSignals(self, idx=0):
-
-        # Extract window from the data
-        # TODO : Handle list of assetInfos
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
 

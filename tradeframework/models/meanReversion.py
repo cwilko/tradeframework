@@ -7,22 +7,17 @@ import quantutils.dataset.pipeline as ppl
 
 class MeanReversion(Model):
 
-    def __init__(self, name, env, start=None, end=None, barOnly=False):
-        Model.__init__(self, name, env)
+    def __init__(self, env, start=None, end=None, barOnly=False):
+        Model.__init__(self, env)
         self.start = start
         self.end = end
-        self.env
         self.window = 1
         self.barOnly = barOnly
         return
 
     # Generate Signals and use them with asset values to calculate allocations
     # NOTE: This implement mean reversion per period. E.g if you provide 5-min date, it will mean revert every 5 mins.
-    def getSignals(self, idx=0):
-
-        # Extract window from the data
-        # TODO : Handle list of assetInfos
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         s = np.insert(np.negative(np.sign(np.diff(window["Open"]))), 0, 0)
         signals = pd.DataFrame(np.array([s, s]).T, index=window.index, columns=["bar", "gap"])

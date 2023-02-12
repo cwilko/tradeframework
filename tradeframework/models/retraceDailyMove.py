@@ -7,8 +7,8 @@ import quantutils.dataset.pipeline as ppl
 
 class RetraceDailyMove(Model):
 
-    def __init__(self, name, env, start="15:00", end="16:00"):
-        Model.__init__(self, name, env)
+    def __init__(self, env, start="15:00", end="16:00"):
+        Model.__init__(self, env)
         self.start = start
         self.end = end
         self.env
@@ -17,10 +17,7 @@ class RetraceDailyMove(Model):
     # Generate Signals and use them with asset values to calculate allocations
     # To be used only when cropped and only for a single period.
     # Will generate signal in the opposite direction (retrace) of the last 24 hrs (dailymove)
-    def getSignals(self, idx=0):
-
-        # Extract window from the data
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
 

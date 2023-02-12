@@ -9,17 +9,15 @@ from tradeframework.api import Model
 
 class StochasticOscXOver(Model):
 
-    def __init__(self, name, env, window, src_sample, tgt_sample, threshold=None):
-        Model.__init__(self, name, env)
+    def __init__(self, env, window, src_sample, tgt_sample, threshold=None):
+        Model.__init__(self, env)
         self.window = window
         self.threshold = threshold
         self.src_sample = src_sample
         self.tgt_sample = tgt_sample
         return
 
-    def getSignals(self, idx=0):
-
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         resample = window.resample(self.tgt_sample, label="left", closed="left").apply({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
 

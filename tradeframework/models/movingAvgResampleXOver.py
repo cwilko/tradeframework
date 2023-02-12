@@ -9,8 +9,8 @@ from tradeframework.api import Model
 
 class MovingAverageResampleXOver(Model):
 
-    def __init__(self, name, env, ma1_fast, ma2_slow, src_sample, tgt_sample):
-        Model.__init__(self, name, env)
+    def __init__(self, env, ma1_fast, ma2_slow, src_sample, tgt_sample):
+        Model.__init__(self, env)
         self.window = max(ma1_fast, ma2_slow)
         self.ma1_fast = ma1_fast
         self.ma2_slow = ma2_slow
@@ -18,9 +18,7 @@ class MovingAverageResampleXOver(Model):
         self.tgt_sample = tgt_sample
         return
 
-    def getSignals(self, idx=0):
-
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         resample = window.resample(self.tgt_sample, label="left", closed="left").apply({"Open": "first"}).dropna()
         ma_fast = tsUtils.MA(resample["Open"].values, self.ma1_fast, self.ma1_fast / 2)

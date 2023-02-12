@@ -1,42 +1,30 @@
-from . import Derivative
-
+from . import WeightGenerator
 
 # ======================
 # Model Class
 # ======================
 
 
-class Model(Derivative):
+class Model(WeightGenerator):
 
     BUY = 1
     CASH = 0
     SELL = -1
 
-    def __init__(self, name, env):
-        Derivative.__init__(self, name, env)
-        self.window = 0  # Default - No window
-        self.assetMap = {}
-
-    # TODO: This only works if you have one asset, and only if the Model has Assets as children (rather than Derivatives)
-    def append(self, asset):
-        storedAsset = self.env.getAssetStore().append(asset)
-        self.assetMap[asset.getName()] = storedAsset
-        self.assets = list(self.assetMap.values())
-        self.weightedAssets = list(self.assetMap.values())
-
-        return super().updateState([self.getSignals(asset.values.index[0])], idx=asset.values.index[0])
+    def __init__(self, env, window=0):
+        self.window = window  # Default - No window
+        self.env = env
 
     # Method for calculating the signals associated with input asset values
-    def getSignals(self, asset):
-        pass
+    def generateWeights(self, derivatives, idx):
+        return [self.getSignals(self.getWindow(derivative, idx), idx) for derivative in derivatives]
 
-    # TODO: Support multiple assets, e.g. getWindow(self, assetName, idx)
-    def getWindow(self, idx):
+    def getWindow(self, derivative, idx):
 
         if (self.window is -1):  # Use all available data
             idx = 0
         elif (idx is not 0):
-            idx = self.assets[0].values.index.get_loc(idx)
+            idx = derivative.values.index.get_loc(idx)
             idx = max(0, idx - self.window)
 
-        return self.assets[0].values[idx:]
+        return derivative.values[idx:]

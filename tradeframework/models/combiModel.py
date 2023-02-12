@@ -6,8 +6,8 @@ import quantutils.dataset.pipeline as ppl
 
 class CombinationModel(Model):
 
-    def __init__(self, name, env, modelList=[], start=None, end=None, barOnly=False):
-        Model.__init__(self, name, env)
+    def __init__(self, env, modelList=[], start=None, end=None, barOnly=False):
+        Model.__init__(self, env)
         self.start = start
         self.end = end
         self.barOnly = barOnly
@@ -15,11 +15,7 @@ class CombinationModel(Model):
         return
 
     # Generate Signals and use them with asset values to calculate allocations
-    def getSignals(self, idx=0):
-
-        # Extract window from the data
-        # TODO : Handle list of assetInfos
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         n = len(self.modelList)
         assetWeights = np.round(np.sum(np.sign([self.env.getPortfolio().findAsset(model).getWeights()[idx:].values for model in self.modelList]), axis=0) / n)

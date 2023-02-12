@@ -8,12 +8,13 @@ import pandas as pd
 
 class Derivative(Asset):
 
-    def __init__(self, name, env, values=None, uAllocations=None, weights=None, returns=None, assets=None, weightedAssets=None):
+    def __init__(self, name, env, values=None, uAllocations=None, weights=None, returns=None, assets=None, weightedAssets=None, weightGenerator=None):
         Asset.__init__(self, name, values)
         self.env = env
         self.uAllocations = uAllocations
         self.weights = weights
         self.returns = returns
+
         if (assets is None):
             self.assets = []
             self.weightedAssets = []
@@ -21,25 +22,16 @@ class Derivative(Asset):
             self.assets = assets
             self.weightedAssets = weightedAssets
 
+        if (weightGenerator is None):
+            self.weightGenerator = env.createOptimizer("EqualWeightsOptimizer")
+        else:
+            self.weightGenerator = weightGenerator
+
+        # Cache for asset searching
+        self.assetCache = {}
+
     def __str__(self):
         return ''.join(['{ "id": "', self.uuid, '", "name": "', self.name, '", "type": "', str(type(self)), '", "assets": [', ','.join([str(asset) for asset in self.assets]), '] }'])
-
-    def updateState(self, weights, idx=0):
-
-        values, uAllocations, weights, returns = self.env.tradeEngine.updateDerivative(self, self.weightedAssets, weights, idx)
-
-        if self.values is None:
-            self.values = values
-            self.uAllocations = uAllocations
-            self.weights = weights
-            self.returns = returns
-        else:
-            self.values = values.combine_first(self.values)
-            self.uAllocations = uAllocations.combine_first(self.uAllocations)
-            self.weights = weights.combine_first(self.weights)
-            self.returns = returns.combine_first(self.returns)
-
-        return self
 
     def getAllocations(self):
         return self.uAllocations
@@ -51,33 +43,58 @@ class Derivative(Asset):
         return self.returns
 
     def getAsset(self, assetName):
-        for asset in self.assets:
-            if asset.getName() == assetName:
-                break
-            else:
-                asset = None
-        return asset
-
-    def findAsset(self, assetName):
-        print("in asset")
+        if assetName in self.assetCache:
+            return self.assetCache[assetName]
         return None
 
-    def getUnderlyingAllocations(self):
-        myUAllocations = None
-        if (self.uAllocations is not None):
-            assetCount = len(self.uAllocations.columns.levels[0])
-            for l1 in range(assetCount):
-                uAllocations = self.assets[l1].getUnderlyingAllocations()
-                for l2 in uAllocations.columns.levels[0]:
-                    assetUAllocation = uAllocations[l2] * \
-                        self.uAllocations[
-                        self.uAllocations.columns.levels[0][l1]].values
-                    if (myUAllocations is None):
-                        myUAllocations = pd.DataFrame(
-                            assetUAllocation.values, index=assetUAllocation.index, columns=[[l2, l2], ['bar', 'gap']])
-                    elif (l2 in myUAllocations.columns.levels[0]):
-                        myUAllocations[l2] += assetUAllocation
-                    else:
-                        myUAllocations = pd.concat(
-                            [myUAllocations, assetUAllocation], axis=1)
-        return myUAllocations
+    def addAsset(self, asset, weighted=True):
+        self.assets.append(asset)
+        if weighted:
+            self.weightedAssets.append(asset)
+
+        # Also add to search cache
+        self.assetCache[asset.getName()] = asset
+
+        return self
+
+    def findAsset(self, assetName):
+        if assetName in self.assetCache:
+            return self.assetCache[assetName]
+        else:
+            for asset in self.assets:
+                foundAsset = asset.findAsset(assetName)
+                if foundAsset is not None:
+                    return foundAsset
+
+        raise Exception('Error: Asset, {0}, not found in portfolio {1}'.format(assetName, self.getName()))
+
+    def refresh(self, idx):
+
+        if not self.weightedAssets:
+            raise Exception('Error: No appendable assets for portfolio: ', self.getName())
+
+        # Update all children
+        [asset.refresh(idx) for asset in self.assets]
+
+        # Calculate portfolio allocation
+        weights = self.weightGenerator.generateWeights(self.weightedAssets, idx=idx)
+
+        # Update derivative state
+        return self.updateState(weights, idx=idx)
+
+    def updateState(self, weights, idx=0):
+
+        values, uAllocations, weights, returns = self.env.tradeEngine.updateDerivative(self, self.weightedAssets, weights, idx)
+
+        if self.weights is None:
+            self.values = values
+            self.uAllocations = uAllocations
+            self.weights = weights
+            self.returns = returns
+        else:
+            self.values = values.combine_first(self.values)
+            self.uAllocations = uAllocations.combine_first(self.uAllocations)
+            self.weights = weights.combine_first(self.weights)
+            self.returns = returns.combine_first(self.returns)
+
+        return self

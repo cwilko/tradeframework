@@ -5,8 +5,8 @@ import pandas as pd
 
 class EqualWeightsOptimizer(Optimizer):
 
-    def __init__(self, name, env, weight=1.0):
-        Optimizer.__init__(self, name, env)
+    def __init__(self, env, weight=1.0):
+        Optimizer.__init__(self, env)
         self.weight = weight
         return
 

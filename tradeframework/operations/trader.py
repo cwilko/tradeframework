@@ -113,3 +113,38 @@ def predictSignals(env, prices, capital=1):
         prices = [prices]
 
     return [getCurrentSignal(env.append(price, copy=True), capital) for price in prices]
+
+# TODO: Add comment to say what this does
+
+
+def getUnderlyingAllocations(derivative):
+
+    currentAllocations = derivative.getAllocations()
+
+    myUAllocations = None
+    if (currentAllocations is not None):
+        # Derivative
+        assetCount = len(currentAllocations.columns.levels[0])
+        for l1 in range(assetCount):
+            uAllocations = getUnderlyingAllocations(derivative.assets[l1])
+            for l2 in uAllocations.columns.levels[0]:
+                assetUAllocation = uAllocations[l2] * \
+                    currentAllocations[
+                    currentAllocations.columns.levels[0][l1]].values
+                if (myUAllocations is None):
+                    myUAllocations = pd.DataFrame(
+                        assetUAllocation.values, index=assetUAllocation.index, columns=[[l2, l2], ['bar', 'gap']])
+                elif (l2 in myUAllocations.columns.levels[0]):
+                    myUAllocations[l2] += assetUAllocation
+                else:
+                    myUAllocations = pd.concat(
+                        [myUAllocations, assetUAllocation], axis=1)
+    else:
+        # Asset
+        myUAllocations = pd.DataFrame(
+            np.ones((len(derivative.values), 2)),
+            columns=[[derivative.name, derivative.name], ['bar', 'gap']],
+            index=derivative.values.index
+        )
+
+    return myUAllocations

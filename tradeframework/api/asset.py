@@ -14,6 +14,8 @@ class Asset:
         self.uuid = str(uuid.uuid4())
         self.name = name
         self.values = values
+        if values is None:
+            self.values = pd.DataFrame()
 
     def __str__(self):
         return ''.join(['{ "id": "', self.uuid, '", "name": "', self.name, '", "type": "', str(type(self)), '"}'])
@@ -27,10 +29,8 @@ class Asset:
     def getValues(self):
         return self.values
 
-    # TODO : Could implement pip here
-    def getUnderlyingAllocations(self):
-        return pd.DataFrame(np.ones((len(self.values), 2)), columns=[
-            [self.name, self.name], ['bar', 'gap']], index=self.values.index)
+    def getAllocations(self):
+        return None
 
     def append(self, asset):
         if self.values is None:
@@ -44,3 +44,9 @@ class Asset:
         asset.uuid = str(uuid.uuid4())
         asset.name = asset.name + "_copy"
         return asset
+
+    def findAsset(self, assetName):
+        return None
+
+    def refresh(self, idx):
+        pass

@@ -11,8 +11,8 @@ from quantutils.api.assembly import MIAssembly
 
 class MIBasicModel(Model):
 
-    def __init__(self, name, env, credstore, dataset_id, training_run_id, threshold=0, barOnly=False, debug=False):
-        Model.__init__(self, name, env)
+    def __init__(self, env, credstore, dataset_id, training_run_id, threshold=0, barOnly=False, debug=False):
+        Model.__init__(self, env)
 
         self.miassembly = MIAssembly(MarketInsights(credstore), Functions(credstore))
         self.dataset_id = dataset_id
@@ -24,11 +24,7 @@ class MIBasicModel(Model):
         return
 
     # Generate Signals and use them with asset values to calculate allocations
-    def getSignals(self, idx=0):
-
-        # Extract window from the data
-        # TODO : Handle list of assetInfos
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         # Obtain the signals for the next n steps from the Market Insights API
         signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])

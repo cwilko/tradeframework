@@ -5,8 +5,8 @@ import pandas as pd
 
 class ZeroWeightsOptimizer(Optimizer):
 
-    def __init__(self, name, env):
-        Optimizer.__init__(self, name, env)
+    def __init__(self, env):
+        Optimizer.__init__(self, env)
         return
 
     def getWeights(self, returns, idx=0):

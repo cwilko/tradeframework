@@ -9,16 +9,14 @@ from tradeframework.api import Model
 
 class MovingAverageXOver(Model):
 
-    def __init__(self, name, env, ma1_fast, ma2_slow):
-        Model.__init__(self, name, env)
+    def __init__(self, env, ma1_fast, ma2_slow):
+        Model.__init__(self, env)
         self.window = max(ma1_fast, ma2_slow)
         self.ma1_fast = ma1_fast
         self.ma2_slow = ma2_slow
         return
 
-    def getSignals(self, idx=0):
-
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         ma_fast = tsUtils.MA(window["Open"].values, self.ma1_fast, self.ma1_fast / 2)
         ma_slow = tsUtils.MA(window["Open"].values, self.ma2_slow, self.ma2_slow / 2)

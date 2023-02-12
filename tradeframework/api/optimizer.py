@@ -1,14 +1,14 @@
+from . import WeightGenerator
 
 # ======================
 # Optimizer Class
 # ======================
 
 
-class Optimizer:
+class Optimizer(WeightGenerator):
 
-    def __init__(self, name, env):
-        self.name = name
+    def __init__(self, env):
         self.env = env
 
-    def getWeights(self, returns):
-        pass
+    def generateWeights(self, derivatives, idx):
+        return self.getWeights([derivative.returns for derivative in derivatives], idx)

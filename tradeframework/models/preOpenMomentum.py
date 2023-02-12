@@ -4,18 +4,13 @@ from tradeframework.api import Model
 
 class PreOpenMomentum(Model):
 
-    def __init__(self, name, env):
-        Model.__init__(self, name, env)
+    def __init__(self, env):
+        Model.__init__(self, env)
         self.window = -1  # Use all data available
         return
 
     # Generate Signals and use them with asset values to calculate allocations
-    def getSignals(self, idx=0):
-
-        # Extract window from the data
-        # TODO : Handle list of assetInfos
-        # TODO: ADD WINDOW SUPPORT
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         context = {}
         context['temp'] = {'data': pd.DataFrame(), 'currentSignal': Model.CASH}

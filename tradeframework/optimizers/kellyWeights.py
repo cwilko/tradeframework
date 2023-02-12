@@ -10,8 +10,8 @@ class KellyOptimizer(Optimizer):
     # window = None -> Lookahead, use all available past/future data to calculate weights
     # window = 0 (default) -> Use all previous data to calculate a weight
     # window = N -> Use a window of N data points to calculate a weight
-    def __init__(self, name, env, window=0, weight=1.0):
-        Optimizer.__init__(self, name, env)
+    def __init__(self, env, window=0, weight=1.0):
+        Optimizer.__init__(self, env)
         self.window = window
         self.weight = weight
         return

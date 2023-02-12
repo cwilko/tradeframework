@@ -9,17 +9,15 @@ from tradeframework.api import Model
 
 class MovingAverageResample(Model):
 
-    def __init__(self, name, env, ma1_win, src_sample, tgt_sample):
-        Model.__init__(self, name, env)
+    def __init__(self, env, ma1_win, src_sample, tgt_sample):
+        Model.__init__(self, env)
         self.window = ma1_win
         self.ma1_win = ma1_win
         self.src_sample = src_sample
         self.tgt_sample = tgt_sample
         return
 
-    def getSignals(self, idx=0):
-
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         resample = window.resample(self.tgt_sample, label="left", closed="left").apply({"Open": "first"}).dropna()
         ma = tsUtils.MA(resample["Open"].values, self.ma1_win, self.ma1_win / 2)

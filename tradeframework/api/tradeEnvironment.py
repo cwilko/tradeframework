@@ -2,7 +2,7 @@
 # TradeEnvironment Class
 # ======================
 
-from . import Portfolio, AssetStore
+from . import AssetStore, Derivative
 import tradeframework.optimizers as opt
 import tradeframework.models as md
 import uuid
@@ -38,25 +38,24 @@ class TradeEnvironment():
         else:
             return self.portfolio
 
-    def setPortfolio(self, portfolio):
-        self.portfolio = portfolio
-        return portfolio
+    def setPortfolio(self, derivative):
+        self.portfolio = derivative
+        return self.portfolio
 
-    def createPortfolio(self, name, optimizer=None):
-        return Portfolio(name, self, optimizer)
+    def createDerivative(self, name, weightGenerator=None):
+        return Derivative(name, self, weightGenerator=weightGenerator)
 
-    def createModel(self, name, modelClass, opts={}):
+    def createModel(self, modelClass, opts={}):
         modelInstance = getattr(md, modelClass)
-        model = modelInstance(name, self, **opts)
+        model = modelInstance(self, **opts)
         return model
 
-    def createOptimizer(self, name, optClass, opts={}):
+    def createOptimizer(self, optClass, opts={}):
         optInstance = getattr(opt, optClass)
-        optimizer = optInstance(name, self, **opts)
+        optimizer = optInstance(self, **opts)
         return optimizer
 
-    # Append an asset con
-    def append(self, asset, copy=False):
+    def refresh(self, idx=0, copy=False):
         if not self.portfolio:
             raise Exception('Error: No portfolio has been configured for this environment.')
 
@@ -64,4 +63,10 @@ class TradeEnvironment():
         portfolio = self.portfolio
         if copy:
             portfolio = portfolio.copy()
-        return portfolio.append(asset)
+        return portfolio.refresh(idx)
+
+    def append(self, asset, refreshPortfolio=False):
+        storedAsset = self.assetStore.append(asset)
+        if refreshPortfolio:
+            self.portfolio.refresh(asset.values.index[0])
+        return storedAsset

@@ -42,21 +42,30 @@ class FrameworkTestPerf(unittest.TestCase):
 
         class RandomModel(Model):
 
-            def getSignals(self, idx=0):
-                window = self.assets[0].values[idx:]
-                loc = self.assets[0].values.index.get_loc(idx)
+            def getSignals(self, window, idx=0):
+                loc = window.index.get_loc(idx)
+                window = window[idx:]
                 signals = pd.DataFrame(np.array([randomSignals[loc:loc + len(window)], randomSignals[loc:loc + len(window)]]).T, index=window.index, columns=["bar", "gap"])
                 return signals
 
-        # Calculate returns via TradeFramework
+        # Create portfolio
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer", opts={"window": 4}))
-        env.setPortfolio(p)
-        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
-        p.addAsset(RandomModel("TestModel2", env))
+        asset = env.append(Asset("DOW"))
+
+        p = env.setPortfolio(
+            env.createDerivative("MyPortfolio", weightGenerator=env.createOptimizer("KellyOptimizer", opts={"window": 4}))
+            .addAsset(
+                env.createDerivative("Test-BuyAndHold", weightGenerator=env.createModel("BuyAndHold"))
+                .addAsset(asset)
+            )
+            .addAsset(
+                env.createDerivative("Test-Random", weightGenerator=RandomModel(env, window=-1))
+                .addAsset(asset)
+            )
+        )
 
         start = time.time()
-        env.append(self.asset1)
+        env.append(self.asset1, refreshPortfolio=True)
         end = time.time()
         print(end - start)
 
@@ -71,22 +80,31 @@ class FrameworkTestPerf(unittest.TestCase):
 
         class RandomModel(Model):
 
-            def getSignals(self, idx=0):
-                window = self.assets[0].values[idx:]
-                loc = self.assets[0].values.index.get_loc(idx)
+            def getSignals(self, window, idx=0):
+                loc = window.index.get_loc(idx)
+                window = window[idx:]
                 signals = pd.DataFrame(np.array([randomSignals[loc:loc + len(window)], randomSignals[loc:loc + len(window)]]).T, index=window.index, columns=["bar", "gap"])
                 return signals
 
-        # Calculate returns via TradeFramework
+        # Create portfolio
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("KellyWeights", "KellyOptimizer", opts={"window": 4}))
-        env.setPortfolio(p)
-        p.addAsset(env.createModel("Test-BuyAndHold", "BuyAndHold"))
-        p.addAsset(RandomModel("TestModel2", env))
+        asset = env.append(Asset("DOW"))
+
+        p = env.setPortfolio(
+            env.createDerivative("MyPortfolio", weightGenerator=env.createOptimizer("KellyOptimizer", opts={"window": 4}))
+            .addAsset(
+                env.createDerivative("Test-BuyAndHold", weightGenerator=env.createModel("BuyAndHold"))
+                .addAsset(asset)
+            )
+            .addAsset(
+                env.createDerivative("Test-Random", weightGenerator=RandomModel(env, window=-1))
+                .addAsset(asset)
+            )
+        )
 
         start = time.time()
         for i in range(len(self.asset1.values)):
-            env.append(Asset("DOW", self.asset1.values[i:i + 1]))
+            env.append(Asset("DOW", self.asset1.values[i:i + 1]), refreshPortfolio=True)
         end = time.time()
         print(end - start)
         self.assertTrue((end - start) < 35, "Operation took too long")

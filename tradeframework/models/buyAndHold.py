@@ -6,21 +6,15 @@ import quantutils.dataset.pipeline as ppl
 
 class BuyAndHold(Model):
 
-    def __init__(self, name, env, start=None, end=None, barOnly=False):
-        Model.__init__(self, name, env)
+    def __init__(self, env, start=None, end=None, barOnly=False):
+        Model.__init__(self, env)
         self.start = start
         self.end = end
         self.barOnly = barOnly
         return
 
     # Generate Signals and use them with asset values to calculate allocations
-    def getSignals(self, idx=0):
-
-        # Extract window from the data
-        # TODO : Handle list of assetInfos
-        # TODO : Handle ohlc from portfolio as an asset
-        # TODO : Handle missing data (nans)
-        window = self.getWindow(idx)
+    def getSignals(self, window, idx=0):
 
         if (self.start is not None):
             signals = pd.DataFrame(np.zeros((len(window), 2)), index=window.index, columns=["bar", "gap"])
