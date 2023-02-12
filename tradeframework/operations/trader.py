@@ -138,7 +138,8 @@ def getUnderlyingAllocations(derivative):
                     myUAllocations[l2] += assetUAllocation
                 else:
                     myUAllocations = pd.concat(
-                        [myUAllocations, assetUAllocation], axis=1)
+                        [myUAllocations, pd.DataFrame(assetUAllocation.values, index=assetUAllocation.index, columns=[[l2, l2], ['bar', 'gap']])], axis=1)
+
     else:
         # Asset
         myUAllocations = pd.DataFrame(

@@ -15,20 +15,30 @@ class BaselineEngine(TradeEngine):
     # Calculate portfolio returns
     # f(Pout, A) => R
     # R1 = P1(A2 - A1) / D1
-    def calculateReturns(self, assetValues):
+    def calculateReturns(self, derivative, idx=0):
 
-        # s1 = allocations.iloc[:,::2]
-        # s2 = allocations.iloc[:,1::2]
-        # s2.columns = s1.columns
+        dValues = derivative.values[idx:][["Open", "Close"]]
+        flatValues = dValues.values.flatten()
+        # Bootstrap with any existing derivative info.
+        loc = -1
+        if (idx != 0):
+            loc = derivative.values.index.get_loc(idx) - 1
+
+        if (loc >= 0):  # Not first index, therefore bootstrap from derivative
+            flatValues = np.insert(flatValues, 0, derivative.values.iloc[loc]["Close"])
+        else:
+            # Bootstrap dummy values for new derivative
+            flatValues = np.insert(flatValues, 0, 1)
 
         # Returns (Bar and Gap)
-        returns = np.diff(assetValues) / assetValues[:-1]
+        returns = np.diff(flatValues) / flatValues[:-1]
 
         # Transaction Costs
         # tx1 = s1.sub(s2.shift(1)).abs().multiply((0 / data.Open), axis=0) - 1
         # tx2 = s2.sub(s1).abs().multiply((0 / data.Close), axis=0) - 1
-
-        return returns
+        dReturns = pd.DataFrame(returns.reshape(dValues.shape), index=dValues.index, columns=['Open', 'Close'])
+        print(dReturns)
+        return dReturns
 
     # f(Pin,A) => Pout, D
     # TODO : Deal with updates after an Open but before Close.
@@ -69,7 +79,7 @@ class BaselineEngine(TradeEngine):
         dWeights = pd.DataFrame(np.hstack([x.reshape(len(assetWeights[0]), 2) for x in np.array(weights).T]), index=assetWeights[0].index, columns=columns)
 
         # n x 2 matrices
-        dReturns = self.calculateReturns(dValues)
+        dReturns = np.diff(dValues) / dValues[:-1]
         dReturns = pd.DataFrame(np.array(dReturns).reshape(assetWeights[0].shape), index=assetWeights[0].index, columns=['Open', 'Close'])
 
         dValues = pd.DataFrame(np.array(dValues[1:]).reshape(assetWeights[0].shape), index=assetWeights[0].index, columns=['Open', 'Close']) \

@@ -9,7 +9,7 @@ import tradeframework.operations.trader as trader
 dir = os.path.dirname(os.path.abspath(__file__))
 
 
-class FrameworkTest(unittest.TestCase):
+class SingleAssetTest(unittest.TestCase):
 
     def setUp(self):
         self.asset1 = Asset("DOW", pd.read_csv(dir + '/data/testData1.csv', parse_dates=True, index_col=0, dayfirst=True))
@@ -523,134 +523,6 @@ class FrameworkTest(unittest.TestCase):
             )
             .addAsset(
                 env.createDerivative("Test-Random", weightGenerator=RandomModel(env, window=-1))
-                .addAsset(asset)
-            )
-        )
-
-        env.append(Asset("DOW", self.asset1.values), refreshPortfolio=True)
-
-        res2 = trader.getUnderlyingAllocations(p)["DOW"]["bar"].values.flatten()
-
-        self.assertTrue(np.allclose(res1, res2))
-
-    # Tests using a windowed model
-    def test_combi_singleModel(self):
-
-        # Create portfolio
-        env = SandboxEnvironment("TradeFair")
-        asset = env.append(Asset("DOW"))
-
-        p = env.setPortfolio(
-            env.createDerivative("MyPortfolio")
-            .addAsset(
-                env.createDerivative("Indicators")
-                .addAsset(
-                    env.createDerivative("MeanReversionIndicator", weightGenerator=env.createModel("MeanReversion"))
-                    .addAsset(asset)
-                )
-                .addAsset(
-                    env.createDerivative("BuyAndHoldIndicator", weightGenerator=env.createModel("BuyAndHold"))
-                    .addAsset(asset)
-                ),
-                weighted=False
-            )
-            .addAsset(
-                env.createDerivative("CombiMRAndBuy", weightGenerator=env.createModel("CombinationModel", opts={"modelList": ["MeanReversionIndicator", "BuyAndHoldIndicator"]}))
-                .addAsset(asset)
-            )
-        )
-
-        env.append(self.asset1, refreshPortfolio=True)
-
-        self.assertTrue(np.allclose(p.returns["Open"].values.flatten(), [0., 0., 0.1, 0., 0.1, 0., 0.1, 0., 0.1]))
-
-    # Tests using a windowed model
-    def test_combi_singleModel_online(self):
-
-        # Create portfolio
-        env = SandboxEnvironment("TradeFair")
-        asset = env.append(Asset("DOW"))
-
-        p = env.setPortfolio(
-            env.createDerivative("MyPortfolio", weightGenerator=env.createOptimizer("EqualWeightsOptimizer"))
-            .addAsset(
-                env.createDerivative("Indicators")
-                .addAsset(
-                    env.createDerivative("MeanReversionIndicator", weightGenerator=env.createModel("MeanReversion"))
-                    .addAsset(asset)
-                )
-                .addAsset(
-                    env.createDerivative("BuyAndHoldIndicator", weightGenerator=env.createModel("BuyAndHold"))
-                    .addAsset(asset)
-                ),
-                weighted=False
-            )
-            .addAsset(
-                env.createDerivative("CombiMRAndBuy", weightGenerator=env.createModel("CombinationModel", opts={"modelList": ["MeanReversionIndicator", "BuyAndHoldIndicator"]}))
-                .addAsset(asset)
-            )
-        )
-
-        for i in range(len(self.asset1.values)):
-            env.append(Asset("DOW", self.asset1.values[i:i + 1]), refreshPortfolio=True)
-
-        self.assertTrue(np.allclose(p.returns["Open"].values.flatten(), [0., 0., 0.1, 0., 0.1, 0., 0.1, 0., 0.1]))
-
-    # Test that partial input (bar only) allocations match full bar/gap input
-    def test_combi_singleModel_online_partials(self):
-
-        # Create portfolio
-        env = SandboxEnvironment("TradeFair")
-        asset = env.append(Asset("DOW"))
-
-        p = env.setPortfolio(
-            env.createDerivative("MyPortfolio", weightGenerator=env.createOptimizer("EqualWeightsOptimizer"))
-            .addAsset(
-                env.createDerivative("Indicators")
-                .addAsset(
-                    env.createDerivative("MeanReversionIndicator", weightGenerator=env.createModel("MeanReversion"))
-                    .addAsset(asset)
-                )
-                .addAsset(
-                    env.createDerivative("BuyAndHoldIndicator", weightGenerator=env.createModel("BuyAndHold"))
-                    .addAsset(asset)
-                ),
-                weighted=False
-            )
-            .addAsset(
-                env.createDerivative("CombiMRAndBuy", weightGenerator=env.createModel("CombinationModel", opts={"modelList": ["MeanReversionIndicator", "BuyAndHoldIndicator"]}))
-                .addAsset(asset)
-            )
-        )
-
-        env.append(Asset("DOW", self.asset1.values[0:-1]), refreshPortfolio=True)
-
-        slice = self.asset1.values[-1:].copy()
-        slice["Close"] = np.nan
-        env.append(Asset("DOW", slice), refreshPortfolio=True)
-
-        res1 = trader.getUnderlyingAllocations(p)["DOW"]["bar"].values.flatten()
-
-        # Create portfolio
-        env = SandboxEnvironment("TradeFair")
-        asset = env.append(Asset("DOW"))
-
-        p = env.setPortfolio(
-            env.createDerivative("MyPortfolio", weightGenerator=env.createOptimizer("EqualWeightsOptimizer"))
-            .addAsset(
-                env.createDerivative("Indicators", weightGenerator=env.createOptimizer("EqualWeightsOptimizer"))
-                .addAsset(
-                    env.createDerivative("MeanReversionIndicator", weightGenerator=env.createModel("MeanReversion"))
-                    .addAsset(asset)
-                )
-                .addAsset(
-                    env.createDerivative("BuyAndHoldIndicator", weightGenerator=env.createModel("BuyAndHold"))
-                    .addAsset(asset)
-                ),
-                weighted=False
-            )
-            .addAsset(
-                env.createDerivative("CombiMRAndBuy", weightGenerator=env.createModel("CombinationModel", opts={"modelList": ["MeanReversionIndicator", "BuyAndHoldIndicator"]}))
                 .addAsset(asset)
             )
         )

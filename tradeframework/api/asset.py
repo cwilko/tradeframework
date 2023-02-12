@@ -10,12 +10,12 @@ import copy as cp
 
 class Asset:
 
-    def __init__(self, name, values=None):
+    def __init__(self, name, values=pd.DataFrame(), returns=pd.DataFrame(), env=None):
         self.uuid = str(uuid.uuid4())
         self.name = name
         self.values = values
-        if values is None:
-            self.values = pd.DataFrame()
+        self.returns = returns
+        self.env = env
 
     def __str__(self):
         return ''.join(['{ "id": "', self.uuid, '", "name": "', self.name, '", "type": "', str(type(self)), '"}'])
@@ -33,10 +33,7 @@ class Asset:
         return None
 
     def append(self, asset):
-        if self.values is None:
-            self.values = asset.values
-        else:
-            self.values = asset.values.combine_first(self.values)
+        self.values = asset.values.combine_first(self.values)
         return self
 
     def copy(self):
@@ -49,4 +46,9 @@ class Asset:
         return None
 
     def refresh(self, idx):
-        pass
+        return self.updateState(None, idx)
+
+    def updateState(self, weights, idx):
+        returns = self.env.tradeEngine.calculateReturns(self, idx)
+        self.returns = returns.combine_first(self.returns)
+        return self

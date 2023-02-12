@@ -8,12 +8,10 @@ import pandas as pd
 
 class Derivative(Asset):
 
-    def __init__(self, name, env, values=None, uAllocations=None, weights=None, returns=None, assets=None, weightedAssets=None, weightGenerator=None):
-        Asset.__init__(self, name, values)
-        self.env = env
+    def __init__(self, name, env, values=pd.DataFrame(), uAllocations=None, weights=None, returns=pd.DataFrame(), assets=None, weightedAssets=None, weightGenerator=None):
+        Asset.__init__(self, name, values=values, returns=returns, env=env)
         self.uAllocations = uAllocations
         self.weights = weights
-        self.returns = returns
 
         if (assets is None):
             self.assets = []

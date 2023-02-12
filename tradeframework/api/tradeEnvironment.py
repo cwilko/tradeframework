@@ -2,9 +2,10 @@
 # TradeEnvironment Class
 # ======================
 
-from . import AssetStore, Derivative
+from . import AssetStore, Derivative, Asset
 import tradeframework.optimizers as opt
 import tradeframework.models as md
+import pandas as pd
 import uuid
 
 
@@ -45,6 +46,9 @@ class TradeEnvironment():
     def createDerivative(self, name, weightGenerator=None):
         return Derivative(name, self, weightGenerator=weightGenerator)
 
+    def createAsset(self, name, values=pd.DataFrame()):
+        return self.append(Asset(name, values=values, env=self), refreshPortfolio=False)
+
     def createModel(self, modelClass, opts={}):
         modelInstance = getattr(md, modelClass)
         model = modelInstance(self, **opts)
@@ -67,6 +71,7 @@ class TradeEnvironment():
 
     def append(self, asset, refreshPortfolio=False):
         storedAsset = self.assetStore.append(asset)
+        storedAsset.env = self  # For backwards compatibility. TODO: migrate to createAsset()
         if refreshPortfolio:
             self.portfolio.refresh(asset.values.index[0])
         return storedAsset
