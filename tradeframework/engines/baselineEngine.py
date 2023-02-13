@@ -49,7 +49,6 @@ class BaselineEngine(TradeEngine):
         noOfValues = len(assetValues)
 
         # Bootstrap with any existing derivative info.
-
         loc = -1
         if (idx != 0):
             loc = assets[0].values.index.get_loc(idx) - 1
@@ -68,7 +67,7 @@ class BaselineEngine(TradeEngine):
         # (ref: Short Sell and Hold phenomenon)
         for i in range(1, noOfValues + 1):
             # TODO : Add Rebalancing support. Currently rebalance on every bar & gap.
-
+            print(allocations[i - 1] * (assetValues[i] - assetValues[i - 1]))
             dValues.append(dValues[i - 1] + sum(allocations[i - 1] * (assetValues[i] - assetValues[i - 1])))
             allocations.append(weights[i - 1] * dValues[i] / assetValues[i])
 
@@ -87,5 +86,4 @@ class BaselineEngine(TradeEngine):
             .assign(Low=lambda x: x[["Open", "Close"]].min(axis=1)) \
             [["Open", "High", "Low", "Close"]]
 
-        print(dAllocations)
         return [dValues, dAllocations, dWeights, dReturns]
