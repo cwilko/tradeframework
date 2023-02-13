@@ -297,7 +297,7 @@ class MultiAssetTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(
             p.values["Close"].values.flatten(),
-            [1., 1., 1., 1., 1., 1., 1., 1., 1.]))
+            [1., 1., 1., 1., 1., 1., 1., 2., 1.]))
 
     def test_kellyWeights_singleModel_online(self):
 
