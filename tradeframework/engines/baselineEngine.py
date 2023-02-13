@@ -87,4 +87,5 @@ class BaselineEngine(TradeEngine):
             .assign(Low=lambda x: x[["Open", "Close"]].min(axis=1)) \
             [["Open", "High", "Low", "Close"]]
 
+        print(dAllocations)
         return [dValues, dAllocations, dWeights, dReturns]
