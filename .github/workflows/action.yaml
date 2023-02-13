@@ -26,7 +26,6 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pytest ./test/unittest/test_multi_asset.py::MultiAssetTest::test_kellyWeights_singleModel
           pytest ./test/unittest/test_single_asset.py 
           pytest ./test/unittest/test_multi_asset.py 
           pytest ./test/unittest/test_topology.py 
