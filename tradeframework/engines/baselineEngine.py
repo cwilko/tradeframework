@@ -67,7 +67,7 @@ class BaselineEngine(TradeEngine):
         # (ref: Short Sell and Hold phenomenon)
         for i in range(1, noOfValues + 1):
             # TODO : Add Rebalancing support. Currently rebalance on every bar & gap.
-            print(allocations[i - 1] * (assetValues[i] - assetValues[i - 1]))
+            print(allocations[i - 1])
             dValues.append(dValues[i - 1] + sum(allocations[i - 1] * (assetValues[i] - assetValues[i - 1])))
             allocations.append(weights[i - 1] * dValues[i] / assetValues[i])
 
