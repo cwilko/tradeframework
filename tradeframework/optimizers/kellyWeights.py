@@ -48,6 +48,7 @@ class KellyOptimizer(Optimizer):
 
         # 1) Remove 0 rows from calculations, 2) Check for one-dimensional arrays, 3) Check for empty arrays (return zero array)
         # TODO : If multiple returns are identical (same M & V), consolidate them and equally portion out the resulting weight
+        returns = np.around(returns, 8)
         F = np.zeros(len(returns))
         mask = ~(returns == 0).all(axis=1)
         returns = returns[mask]

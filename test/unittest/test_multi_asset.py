@@ -293,11 +293,9 @@ class MultiAssetTest(unittest.TestCase):
             p.getAsset("Test-BuyAndHold").getAllocations()["DOW"]["gap"].values.flatten(),
             [0.01, 0.0125, 0.01136364, 0.01420455, 0.01291322, 0.01614153, 0.01467412, 0.01834265, 0.01667513]))
 
-        print(p.values["Close"].values.flatten())
-
         self.assertTrue(np.allclose(
             p.values["Close"].values.flatten(),
-            [1., 1., 1., 1., 1., 1., 1., 2., 1.]))
+            [1., 1., 1., 1., 1., 1., 1., 1., 1.]))
 
     def test_kellyWeights_singleModel_online(self):
 
@@ -326,7 +324,7 @@ class MultiAssetTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(
             p.values["Close"].values.flatten(),
-            [1., 1., 1., 1., 1., 1., 1., 2.25, 2.25]))
+            [1., 1., 1., 1., 1., 1., 1., 1., 1.]))
 
     def test_kellyWeights_multiModel(self):
 
@@ -366,7 +364,7 @@ class MultiAssetTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(
             p.returns["Open"].values.flatten(),
-            [0., 0., 0., 0., 0., 0., 0., 1.5, 0.]))
+            [0., 0., 0., 0., 0., 0., 0., 0., 0.]))
 
     def test_kellyWeights_multiModel_online(self):
 
@@ -407,7 +405,7 @@ class MultiAssetTest(unittest.TestCase):
 
         self.assertTrue(np.allclose(
             p.returns["Open"].values.flatten(),
-            [0., 0., 0., 0., 0., 0., 0., 1.5, 0.]))
+            [0., 0., 0., 0., 0., 0., 0., 0., 0.]))
 
     def test_kellyWeights_multiModel_online_partials(self):
 
