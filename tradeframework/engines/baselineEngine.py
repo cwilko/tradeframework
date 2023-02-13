@@ -28,7 +28,7 @@ class BaselineEngine(TradeEngine):
             flatValues = np.insert(flatValues, 0, derivative.values.iloc[loc]["Close"])
         else:
             # Bootstrap dummy values for new derivative
-            flatValues = np.insert(flatValues, 0, 1)
+            flatValues = np.insert(flatValues, 0, derivative.values.iloc[0]["Open"])
 
         # Returns (Bar and Gap)
         returns = np.diff(flatValues) / flatValues[:-1]
@@ -37,7 +37,7 @@ class BaselineEngine(TradeEngine):
         # tx1 = s1.sub(s2.shift(1)).abs().multiply((0 / data.Open), axis=0) - 1
         # tx2 = s2.sub(s1).abs().multiply((0 / data.Close), axis=0) - 1
         dReturns = pd.DataFrame(returns.reshape(dValues.shape), index=dValues.index, columns=['Open', 'Close'])
-        print(dReturns)
+
         return dReturns
 
     # f(Pin,A) => Pout, D
