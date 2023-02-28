@@ -7,7 +7,7 @@ import math
 
 def getTradingInfo(derivative, startCapital=1, unitAllocations=True, summary=True):
     ocData = derivative.values[["Open", "Close"]]
-    ua = derivative.getUnderlyingAllocations()  # * startCapital * derivative.values.values
+    ua = getUnderlyingAllocations(derivative)  # * startCapital * derivative.values.values
     if not unitAllocations:
         ua = ua * startCapital * ocData.values
     returns = pd.DataFrame(ocData.values, index=ocData.index, columns=[["Capital", "Capital"], ocData.columns])
@@ -21,7 +21,7 @@ def getTradingInfo(derivative, startCapital=1, unitAllocations=True, summary=Tru
         trade = pd.DataFrame(
             (a - b).reshape(len(ocData), 2), index=ua[l1].index, columns=ua[l1].columns)
         prices = pd.DataFrame(
-            derivative.env.getAssetStore().getAsset("DOW").values[["Open", "Close"]].values, index=ua[l1].index, columns=["Open", "Close"])
+            derivative.env.getAssetStore().getAsset(l1).values[["Open", "Close"]].values, index=ua[l1].index, columns=["Open", "Close"])
         results.append(pd.concat([prices, ua[l1], trade], keys=[
                        "Price", "Allocation", "Trade"], axis=1))
 
@@ -47,13 +47,14 @@ def getSignal(x):
 # Get the signal associated with the most recent prices in the tradingInfo structure
 
 
-def getCurrentSignal(portfolio, capital=1):
+def getCurrentSignal(portfolio, capital=1, target=None):
     tradingInfo = getTradingInfo(portfolio, summary=False)
     idx = 0
-    target = "OPEN"
-    if not math.isnan(tradingInfo[-1:].values.flatten()[-1]):
-        idx = 1
-        target = "CLOSE"
+    if not target:
+        target = "OPEN"
+        if not math.isnan(tradingInfo[-1:].values.flatten()[-1]):
+            idx = 1
+            target = "CLOSE"
 
     row = tradingInfo[-1:]  # Get last seen row of table
     markets = row.columns.levels[0].values[1:]
@@ -124,13 +125,10 @@ def getUnderlyingAllocations(derivative):
     myUAllocations = None
     if (currentAllocations is not None):
         # Derivative
-        assetCount = len(currentAllocations.columns.levels[0])
-        for l1 in range(assetCount):
-            uAllocations = getUnderlyingAllocations(derivative.assets[l1])
+        for l1 in derivative.weightedAssets:
+            uAllocations = getUnderlyingAllocations(l1)
             for l2 in uAllocations.columns.levels[0]:
-                assetUAllocation = uAllocations[l2] * \
-                    currentAllocations[
-                    currentAllocations.columns.levels[0][l1]].values
+                assetUAllocation = uAllocations[l2] * currentAllocations[l1.getName()].values
                 if (myUAllocations is None):
                     myUAllocations = pd.DataFrame(
                         assetUAllocation.values, index=assetUAllocation.index, columns=[[l2, l2], ['bar', 'gap']])

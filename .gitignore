@@ -8,3 +8,4 @@ test/data
 **/test-reports
 build
 *egg-info
+*.pkl

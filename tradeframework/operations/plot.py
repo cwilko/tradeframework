@@ -38,7 +38,7 @@ def plotWeightedUnderlying(derivative, underlyingName, options=None):
 # Helper method to pretty print derviative performance
 
 
-def plotReturns(derivative, baseline=None, log=False, includeComponents=False, includePrimary=True, custom=[]):
+def plotReturns(derivative, baseline=None, log=False, includeComponents=False, includePrimary=True, normalise=False, custom=[]):
 
     assets = []
 
@@ -79,7 +79,10 @@ def plotReturns(derivative, baseline=None, log=False, includeComponents=False, i
     ax.xaxis.set_major_formatter(auto_formatter)
 
     for asset in assets:
-        ax.plot(pnl(asset), label=asset.name)
+        data = pnl(asset)
+        if normalise:
+            data = data / data[-1]
+        ax.plot(data, label=asset.name)
 
     ax.xaxis_date()
     ax.autoscale_view()

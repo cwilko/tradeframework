@@ -55,6 +55,10 @@ class Derivative(Asset):
 
         return self
 
+    def addStoredAsset(self, names):
+        [self.addAsset(self.env.getAssetStore().getAsset(name)) for name in names]
+        return self
+
     def findAsset(self, assetName):
         if assetName in self.assetCache:
             return self.assetCache[assetName]

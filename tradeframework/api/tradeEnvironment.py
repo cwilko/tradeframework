@@ -49,6 +49,9 @@ class TradeEnvironment():
     def createAsset(self, name, values=pd.DataFrame()):
         return self.append(Asset(name, values=values, env=self), refreshPortfolio=False)
 
+    def createAssets(self, marketData):
+        return [self.createAsset(name, marketData.xs(name, level="mID")) for name in marketData.index.get_level_values("mID").unique().values]
+
     def createModel(self, modelClass, opts={}):
         modelInstance = getattr(md, modelClass)
         model = modelInstance(self, **opts)

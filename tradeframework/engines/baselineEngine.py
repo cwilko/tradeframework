@@ -48,6 +48,9 @@ class BaselineEngine(TradeEngine):
         weights = np.array([weights.values.flatten() for weights in assetWeights]).T
         noOfValues = len(assetValues)
 
+        # if len(assetValues) == len(assets):
+        #    raise Exception('Error: Not all assets have the same length.')
+
         # Bootstrap with any existing derivative info.
         loc = -1
         if (idx != 0):

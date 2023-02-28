@@ -11,4 +11,4 @@ from .movingAvg import MovingAverage
 from .movingAvgXOver import MovingAverageXOver
 from .movingAvgResample import MovingAverageResample
 from .movingAvgResampleXOver import MovingAverageResampleXOver
-from .stochOscXOver import StochasticOscXOver
+from .stochOscXOver import StochasticOscXOver, StochasticOscResampleXOver
