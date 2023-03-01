@@ -15,11 +15,14 @@ class StochasticOscXOver(Model):
 
     def getSignals(self, window, idx=0):
 
-        st_osc = tsUtils.stoch_osc(window, self.window)
+        self.st_osc = tsUtils.stoch_osc(window, self.window)
 
-        signals = np.nan_to_num(np.sign(st_osc["%K"] - st_osc["%D"]), 0)
+        signals = np.nan_to_num(np.sign(self.st_osc["%K"] - self.st_osc["%D"]), 0)
         if self.threshold:
-            signals[st_osc["%K"].between(self.threshold, 100 - self.threshold)] = 0
+            signals[((self.st_osc["%K"] > self.threshold)
+                     & (self.st_osc["%K"] - self.st_osc["%D"] > 0))
+                    | ((self.st_osc["%K"] < (100 - self.threshold))
+                        & (self.st_osc["%K"] - self.st_osc["%D"] < 0))] = 0
         signals = np.roll(signals, 1)
         signals[0] = 0
 

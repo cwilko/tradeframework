@@ -19,7 +19,7 @@ def getTradingInfo(derivative, startCapital=1, unitAllocations=True, summary=Tru
         b = np.roll(a, 1)
         b[0] = 0
         trade = pd.DataFrame(
-            (a - b).reshape(len(ocData), 2), index=ua[l1].index, columns=ua[l1].columns)
+            np.round((a - b), 8).reshape(len(ocData), 2), index=ua[l1].index, columns=ua[l1].columns)
         prices = pd.DataFrame(
             derivative.env.getAssetStore().getAsset(l1).values[["Open", "Close"]].values, index=ua[l1].index, columns=["Open", "Close"])
         results.append(pd.concat([prices, ua[l1], trade], keys=[
