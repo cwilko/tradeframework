@@ -46,8 +46,6 @@ class StochasticOscResampleXOver(Model):
 
         st_osc = tsUtils.stoch_osc(resample, self.window)
 
-        print(st_osc)
-
         resample_signals = np.nan_to_num(np.sign(st_osc["%K"] - st_osc["%D"]), 0)
         if self.threshold:
             resample_signals[st_osc["%K"].between(self.threshold, 100 - self.threshold)] = 0
