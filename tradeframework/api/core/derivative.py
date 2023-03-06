@@ -67,8 +67,7 @@ class Derivative(Asset):
                 foundAsset = asset.findAsset(assetName)
                 if foundAsset is not None:
                     return foundAsset
-
-        raise Exception('Error: Asset, {0}, not found in portfolio {1}'.format(assetName, self.getName()))
+        return None
 
     def refresh(self, idx):
 

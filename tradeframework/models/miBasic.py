@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import datetime
-from tradeframework.api import Model
+from tradeframework.api.core import Model
 
 import quantutils.model.utils as mlutils
 from quantutils.api.marketinsights import MarketInsights

@@ -2,7 +2,7 @@ import unittest
 import os
 import pandas as pd
 import numpy as np
-from tradeframework.api import Asset, Model
+from tradeframework.api.core import Asset, Model
 from tradeframework.environments import SandboxEnvironment
 import tradeframework.operations.trader as trader
 

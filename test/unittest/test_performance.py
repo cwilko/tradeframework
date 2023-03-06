@@ -5,7 +5,7 @@ import numpy as np
 import time
 import random
 import pytest
-from tradeframework.api import Asset, Model
+from tradeframework.api.core import Asset, Model
 from tradeframework.environments import SandboxEnvironment
 
 dir = os.path.dirname(os.path.abspath(__file__))

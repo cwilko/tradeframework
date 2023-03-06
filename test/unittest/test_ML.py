@@ -2,7 +2,7 @@ import unittest
 import os
 import pandas as pd
 import numpy as np
-from tradeframework.api import Asset
+from tradeframework.api.core import Asset
 from tradeframework.environments import SandboxEnvironment
 import tradeframework.operations.utils as utils
 from quantutils.api.auth import CredentialsStore
@@ -23,13 +23,20 @@ class FrameworkTest(unittest.TestCase):
         TRAINING_RUN_ID = "94b227b9d7b22c920333aa36d23669c8"
         DATASET_ID = "4234f0f1b6fcc17f6458696a6cdf5101"
 
-        # Calculate returns via TradeFramework
+        # Create portfolio
         env = SandboxEnvironment("TradeFair")
-        p = env.createPortfolio("MyPortfolio", optimizer=env.createOptimizer("EqualWeights", "EqualWeightsOptimizer"))
-        env.setPortfolio(p)
-        p.addAsset(env.createModel("Test-MIBasicModel", "MIBasicModel", opts={'credstore': CredentialsStore(), 'dataset_id': DATASET_ID, 'training_run_id': TRAINING_RUN_ID, 'threshold': 0}))
+        asset = env.append(Asset("DOW"))
 
-        env.append(Asset("DOW", self.asset1.values))
+        p = env.setPortfolio(
+            env.createDerivative("MyPortfolio", weightGenerator=env.createOptimizer("EqualWeightsOptimizer"))
+            .addAsset(
+                env.createDerivative("Test-MIBasicModel", weightGenerator=env.createModel("MIBasicModel", opts={'credstore': CredentialsStore(), 'dataset_id': DATASET_ID, 'training_run_id': TRAINING_RUN_ID, 'threshold': 0}))
+                .addAsset(asset)
+            )
+        )
+
+        env.append(self.asset1)
+        env.refresh()
 
         # Check results
         self.assertTrue(np.allclose(np.prod(utils.getPeriodReturns(p.returns) + 1), 0.9941924543457394))

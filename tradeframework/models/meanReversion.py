@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tradeframework.api import Model
+from tradeframework.api.core import Model
 
 import quantutils.dataset.pipeline as ppl
 

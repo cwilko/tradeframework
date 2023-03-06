@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7"]
+        python-version: ["3.8", "3.9"]
 
     steps:
       - uses: actions/checkout@v3
@@ -23,6 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
           pip install . --upgrade
+          pip install -r ./test/requirements.txt
 
       - name: Test with pytest
         run: |
@@ -30,3 +31,4 @@ jobs:
           pytest ./test/unittest/test_multi_asset.py 
           pytest ./test/unittest/test_topology.py 
           pytest ./test/unittest/test_performance.py 
+          pytest ./test/unittest/test_signals.py 

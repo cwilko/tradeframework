@@ -1,5 +1,5 @@
 import pandas as pd
-from tradeframework.api import Model
+from tradeframework.api.core import Model
 
 
 class PreOpenMomentum(Model):

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 import quantutils.core.timeseries as tsUtils
-from tradeframework.api import Model
+from tradeframework.api.core import Model
 
 
 # Trade if price is higher/lower than MA

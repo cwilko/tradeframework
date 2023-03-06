@@ -4,7 +4,7 @@
 # For integration with a Zipline framework
 # ======================
 
-from tradeframework.api import TradeEnvironment
+from tradeframework.api.core import TradeEnvironment
 
 
 class ZiplineEnvironment(TradeEnvironment):

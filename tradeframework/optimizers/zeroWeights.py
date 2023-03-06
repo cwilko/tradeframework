@@ -1,4 +1,4 @@
-from tradeframework.api import Optimizer
+from tradeframework.api.core import Optimizer
 import numpy as np
 import pandas as pd
 

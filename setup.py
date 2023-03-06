@@ -1,5 +1,5 @@
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -24,7 +24,7 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.0',  # Required
+    version='0.2.0',  # Required
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
@@ -32,8 +32,6 @@ setup(
     description='A back testing framework',  # Required
 
     install_requires=requirements,
-
-    extras_require={'plot': ['matplotlib>=2.2.2', 'pyfolio>=0.9.0']},
 
     # dependency_links=['-e git+https://github.com/cwilko/quantutils#egg=quantutils'],
 
@@ -46,7 +44,7 @@ setup(
     #
     #   py_modules=["my_module"],
     #
-    packages=find_packages(exclude=['contrib', 'docs', 'test']),  # Required
+    packages=find_namespace_packages(include=['tradeframework.*']),  # Required
 
 
 )

@@ -3,10 +3,10 @@
 # ======================
 
 from . import AssetStore, Derivative, Asset
-import tradeframework.optimizers as opt
-import tradeframework.models as md
 import pandas as pd
 import uuid
+import copy as cp
+import importlib
 
 
 class TradeEnvironment():
@@ -33,6 +33,12 @@ class TradeEnvironment():
     def getTimezone(self):
         return self.tz
 
+    def copy(self):
+        env = cp.deepcopy(self)
+        env.uuid = str(uuid.uuid4())
+        env.name = env.name + "_copy"
+        return env
+
     def getPortfolio(self):
         if not self.portfolio:
             raise Exception('Error: No portfolio has been configured for this environment.')
@@ -43,6 +49,14 @@ class TradeEnvironment():
         self.portfolio = derivative
         return self.portfolio
 
+    def findAsset(self, assetName):
+        if assetName == self.getPortfolio().getName():
+            return self.getPortfolio()
+        result = self.getPortfolio().findAsset(assetName)
+        if not result:
+            raise Exception('Error: Asset, {0}, not found in portfolio {1}'.format(assetName, self.getName()))
+        return result
+
     def createDerivative(self, name, weightGenerator=None):
         return Derivative(name, self, weightGenerator=weightGenerator)
 
@@ -52,25 +66,23 @@ class TradeEnvironment():
     def createAssets(self, marketData):
         return [self.createAsset(name, marketData.xs(name, level="mID")) for name in marketData.index.get_level_values("mID").unique().values]
 
-    def createModel(self, modelClass, opts={}):
-        modelInstance = getattr(md, modelClass)
+    def createModel(self, modelClass, modelModule="tradeframework.models", opts={}):
+        module = importlib.import_module(modelModule)
+        modelInstance = getattr(module, modelClass)
         model = modelInstance(self, **opts)
         return model
 
-    def createOptimizer(self, optClass, opts={}):
-        optInstance = getattr(opt, optClass)
+    def createOptimizer(self, optClass, optModule="tradeframework.optimizers", opts={}):
+        module = importlib.import_module(optModule)
+        optInstance = getattr(module, optClass)
         optimizer = optInstance(self, **opts)
         return optimizer
 
-    def refresh(self, idx=0, copy=False):
+    def refresh(self, idx=0):
         if not self.portfolio:
             raise Exception('Error: No portfolio has been configured for this environment.')
 
-        # Mediate between our Portfolio and the Environment
-        portfolio = self.portfolio
-        if copy:
-            portfolio = portfolio.copy()
-        return portfolio.refresh(idx)
+        return self.portfolio.refresh(idx)
 
     def append(self, asset, refreshPortfolio=False):
         storedAsset = self.assetStore.append(asset)

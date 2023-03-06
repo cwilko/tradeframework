@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tradeframework.api import Model
+from tradeframework.api.core import Model
 import quantutils.dataset.pipeline as ppl
 
 
@@ -18,7 +18,8 @@ class CombinationModel(Model):
     def getSignals(self, window, idx=0):
 
         n = len(self.modelList)
-        assetWeights = np.round(np.sum(np.sign([self.env.getPortfolio().findAsset(model).getWeights()[idx:].values for model in self.modelList]), axis=0) / n)
+        [print(self.env.findAsset(model).getWeights()[idx:].values) for model in self.modelList]
+        assetWeights = np.round(np.sum(np.sign([self.env.findAsset(model).getWeights()[idx:].values for model in self.modelList]), axis=0) / n)
         signals = pd.DataFrame(assetWeights, index=window.index, columns=["bar", "gap"])
 
         if (self.start is not None):

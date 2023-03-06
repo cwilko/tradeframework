@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 import quantutils.core.timeseries as tsUtils
-from tradeframework.api import Model
+from tradeframework.api.core import Model
 
 
 class StochasticOscXOver(Model):

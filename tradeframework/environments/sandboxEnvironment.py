@@ -4,7 +4,7 @@
 # For representing a Spread Betting trading platform
 # ======================
 
-from tradeframework.api import TradeEnvironment
+from tradeframework.api.core import TradeEnvironment
 from tradeframework.engines import BaselineEngine
 from tradeframework.tx import SpreadsTxMgr
 
