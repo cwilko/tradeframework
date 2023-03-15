@@ -2,6 +2,7 @@ import unittest
 import os
 import pandas as pd
 import numpy as np
+import hashlib
 from tradeframework.api.core import Asset, Model
 from tradeframework.environments import SandboxEnvironment
 import tradeframework.operations.trader as trader
@@ -532,6 +533,30 @@ class SingleAssetTest(unittest.TestCase):
         res2 = trader.getUnderlyingAllocations(p)["DOW"]["bar"].values.flatten()
 
         self.assertTrue(np.allclose(res1, res2))
+
+   # Tests using a windowed model
+    def test_stochosc_singleModel(self):
+
+        dowAsset = Asset("DOW", pd.read_csv(dir + '/data/testDOW.csv', parse_dates=True, index_col=0, dayfirst=True))
+
+        # Create portfolio
+        env = SandboxEnvironment("TradeFair")
+        asset = env.append(Asset("DOW"))
+
+        p = env.setPortfolio(
+            env.createDerivative("MyPortfolio", weightGenerator=env.createOptimizer("EqualWeightsOptimizer"))
+            .addAsset(
+                env.createDerivative("Test-StochOSC", weightGenerator=env.createModel("StochasticOscXOver", opts={"window": 3, "threshold": 40}))
+                .addAsset(asset)
+            )
+        )
+
+        env.append(dowAsset)
+        env.refresh()
+
+        print(p.returns)
+        assert p.returns.shape == (95, 2)
+        assert hashlib.md5(p.returns.values.flatten()).hexdigest() == "058c978201a919f2457d7d919fb81b7c"
 
 if __name__ == '__main__':
     unittest.main()

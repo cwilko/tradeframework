@@ -18,8 +18,7 @@ class CombinationModel(Model):
     def getSignals(self, window, idx=0):
 
         n = len(self.modelList)
-        [print(self.env.findAsset(model).getWeights()[idx:].values) for model in self.modelList]
-        assetWeights = np.round(np.sum(np.sign([self.env.findAsset(model).getWeights()[idx:].values for model in self.modelList]), axis=0) / n)
+        assetWeights = (np.sum(np.sign([self.env.findAsset(model).getWeights()[idx:].values for model in self.modelList]), axis=0) / n).round()
         signals = pd.DataFrame(assetWeights, index=window.index, columns=["bar", "gap"])
 
         if (self.start is not None):
