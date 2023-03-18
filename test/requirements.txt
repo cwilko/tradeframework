@@ -1,1 +1,2 @@
 tradeframework-insights @ git+https://github.com/cwilko/tradeframework-insights.git
+#marketinsights-ml[tf] @ git+https://github.com/cwilko/marketinsights-ml.git

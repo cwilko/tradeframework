@@ -1,5 +1,4 @@
 quantutils @ git+https://github.com/cwilko/quantutils.git
-marketinsights-remote @ git+https://github.com/cwilko/marketinsights-remote.git
 numpy>=1.19,<=1.23.5
 pandas>=1.1,<=1.5.3
 
