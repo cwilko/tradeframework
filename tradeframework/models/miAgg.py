@@ -3,10 +3,10 @@ import numpy as np
 import datetime
 from tradeframework.api.core import Model
 
-import quantutils.model.utils as mlutils
-from quantutils.api.marketinsights import MarketInsights
-from quantutils.api.functions import Functions
-from quantutils.api.assembly import MIAssembly
+import marketinsights.utils.model as mlutils
+from marketinsights.remote.ml import MarketInsights
+from marketinsights.remote.ibmcloud import CloudFunctions
+from marketinsights.remote.assembly import MarketInsightsAssembly
 
 
 class MIAggregateModel(Model):
@@ -14,7 +14,7 @@ class MIAggregateModel(Model):
     def __init__(self, env, credstore, mi_models, aggMethod, threshold=0, barOnly=False, debug=False):
         Model.__init__(self, env)
 
-        self.miassembly = MIAssembly(MarketInsights(credstore), Functions(credstore))
+        self.miassembly = MarketInsightsAssembly(MarketInsights(credstore), CloudFunctions(credstore))
         self.modelConfig = mi_models
         self.aggMethod = aggMethod
         self.threshold = threshold

@@ -5,7 +5,7 @@ import numpy as np
 from tradeframework.api.core import Asset
 from tradeframework.environments import SandboxEnvironment
 import tradeframework.operations.utils as utils
-from quantutils.api.auth import CredentialsStore
+from marketinsights.utils.auth import CredentialsStore
 
 dir = os.path.dirname(os.path.abspath(__file__))
 
