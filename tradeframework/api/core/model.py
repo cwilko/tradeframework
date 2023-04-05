@@ -17,13 +17,16 @@ class Model(WeightGenerator):
 
     # Method for calculating the signals associated with input asset values
     def generateWeights(self, derivatives, idx):
-        return [self.getSignals(self.getWindow(derivative, idx), idx) for derivative in derivatives]
+        return [
+            self.getSignals(self.getWindow(derivative, idx), idx)
+            for derivative in derivatives
+        ]
 
     def getWindow(self, derivative, idx):
 
-        if (self.window is -1):  # Use all available data
+        if self.window == -1:  # Use all available data
             idx = 0
-        elif (idx is not 0):
+        elif idx != 0:
             idx = derivative.values.index.get_loc(idx)
             idx = max(0, idx - self.window)
 
