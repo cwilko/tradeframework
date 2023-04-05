@@ -1,7 +1,7 @@
 from .preOpenMomentum import PreOpenMomentum
 from .buyAndHold import BuyAndHold
 from .sellAndHold import SellAndHold
-from .baseline import RandomSignals, MaxReturn, MinReturn
+from .baseline import RandomWalk, MaxReturn, MinReturn
 from .meanReversion import MeanReversion
 from .trendFollowing import TrendFollowing
 from .retraceDailyMove import RetraceDailyMove
